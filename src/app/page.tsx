@@ -48,7 +48,8 @@ export default async function BriefingPage({ searchParams }: PageProps<"/">) {
   if (!contactCount) return <Welcome />;
 
   const briefing = await buildBriefing(ctx, evalDate);
-  const catchUp = await buildCatchUpDeck(ctx, evalDate, briefing);
+  // The nudge only needs names, so reuse stored assessments rather than calling Claude on page load.
+  const catchUp = await buildCatchUpDeck(ctx, evalDate, briefing, { classify: false });
   const n = briefing.recommendations.length;
 
   return (

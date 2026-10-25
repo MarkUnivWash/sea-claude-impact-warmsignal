@@ -13,6 +13,31 @@ export type Contact = {
   last_outreach_at: string | null;
   outreach_snoozed_until: string | null;
   outreach_draft: string | null;
+  // Data contract (docs/data-contract.md). email/phone never leave the app.
+  linkedin_url: string | null;
+  email: string | null;
+  phone: string | null;
+  location: string | null;
+  source: string[];
+  connected_on: string | null;
+  profile_history: ProfileChange[];
+  outreach_assessment: OutreachAssessment | null;
+  outreach_assessed_at: string | null;
+};
+
+export type ProfileChange = { company: string | null; title: string | null; seen_at: string };
+
+/** Claude's catch-up judgment for one contact (src/lib/classify.ts). Scores are computed from it in code. */
+export type OutreachAssessment = {
+  outreach_value: number; // 0-5
+  hook: "give" | "need" | "news" | "job_change" | "follow_up" | "reconnect" | "none";
+  why_now: string;
+  timeliness: number; // 0-5
+  confidence: number; // 0-1
+  appropriate: boolean;
+  concern: string | null;
+  model: string;
+  input_hash: string;
 };
 
 export type SourcedItem = { text: string; source_url: string; date: string | null };
@@ -37,6 +62,9 @@ export type Interaction = {
   raw_notes: string;
   context: { summary?: string; uncertainties?: string[] } | null;
   extracted_at: string | null;
+  kind: "note" | "onboarding_quick_note" | "meeting_followup";
+  outcome: "positive" | "neutral" | "negative" | null;
+  opportunity_id: string | null;
 };
 
 export type Signal = {

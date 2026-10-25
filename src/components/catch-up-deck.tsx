@@ -3,6 +3,7 @@
 import Link from "next/link";
 import {
   ArrowUp,
+  Briefcase,
   Check,
   Clock,
   Coffee,
@@ -30,6 +31,7 @@ type Exit = "left" | "right" | "up" | null;
 const REASON_ICONS: Record<ReasonKind, React.ReactNode> = {
   give: <HandHeart className="size-4 text-emerald-600" />,
   need: <Lightbulb className="size-4 text-violet-500" />,
+  job_change: <Briefcase className="size-4 text-amber-500" />,
   news: <Newspaper className="size-4 text-sky-500" />,
   last_time: <MessageCircle className="size-4 text-slate-400" />,
 };
@@ -250,12 +252,18 @@ function PersonCard({ c, meet, later }: { c: CatchUpCard; meet: number; later: n
       </div>
 
       <ul className="flex-1 space-y-3 overflow-hidden px-6 py-4 text-sm leading-snug text-slate-700">
-        {c.reasons.length === 0 && (
+        {c.whyNow && (
+          <li className="flex gap-3 font-medium text-slate-900">
+            <Sparkles className="mt-0.5 size-4 shrink-0 text-ink-500" />
+            <span className="line-clamp-2">{c.whyNow}</span>
+          </li>
+        )}
+        {c.reasons.length === 0 && !c.whyNow && (
           <li className="flex gap-3 text-slate-500">
             <Sparkles className="size-4 shrink-0 text-ink-400" /> It&apos;s been a while. A simple check-in keeps the connection warm.
           </li>
         )}
-        {c.reasons.slice(0, 3).map((r) => (
+        {c.reasons.slice(0, c.whyNow ? 2 : 3).map((r) => (
           <li key={r.kind} className="flex gap-3">
             <span className="mt-0.5 shrink-0">{REASON_ICONS[r.kind]}</span>
             <span className="line-clamp-3">{r.text}</span>

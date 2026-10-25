@@ -36,6 +36,7 @@ npm run seed -- --email you@example.com --reset --export
 | Note extraction | `ANTHROPIC_MODEL` | `claude-opus-5-5` |
 | Intro matching (the judge) | `ANTHROPIC_MATCH_MODEL` | same as `ANTHROPIC_MODEL` |
 | Web-enrichment summaries, intro and catch-up drafts | `ANTHROPIC_FAST_MODEL` | `claude-haiku-4-5` |
+| Catch-up classifier (who to reach out to, and why now) | `ANTHROPIC_CLASSIFIER_MODEL` | same as `ANTHROPIC_FAST_MODEL` |
 
 Any stage can run on Haiku 4.5. `src/lib/claude.ts` leaves out `effort` and the server-side fallback beta for Haiku, because Haiku doesn't accept them. To make Haiku the judge, set `ANTHROPIC_MATCH_MODEL=claude-haiku-4-5`. If you do, re-check the expected demo outcomes below, because matching enforces subtle rules (investment criteria, confidentiality, declined intro types).
 
@@ -48,6 +49,9 @@ Any stage can run on Haiku 4.5. `src/lib/claude.ts` leaves out `effort` and the 
 | **Scoring weights, cooling curve, eligibility** | `src/lib/scoring.ts` |
 | Briefing assembly, dedupe, next action | `src/lib/briefing.ts` |
 | Outreach drafts (FR-08) | `src/lib/draft.ts` |
+| Catch-up deck ranking | `src/lib/catch-up.ts` |
+| Catch-up classifier (Claude) | `src/lib/classify.ts` |
+| **What we store per contact** | `docs/data-contract.md` |
 | Schema | `supabase/migrations/` |
 | Sample data | `data/contacts.csv`, `data/notes.json` |
 

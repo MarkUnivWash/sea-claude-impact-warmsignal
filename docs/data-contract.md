@@ -2,7 +2,7 @@
 
 This file lists everything WarmSignal stores about a person in a user's network, along with where each item comes from, who writes it, how fresh it stays, and where it is allowed to go. Each user's rows belong to that user (`owner_id`) and are protected by RLS.
 
-Status: ✅ = exists in the schema today · 🆕 = proposed (needs a migration)
+Status: ✅ = in the schema (see `supabase/migrations/`) · 🆕 = proposed, not yet implemented
 
 ## Rules that apply to every field
 
@@ -23,10 +23,10 @@ Status: ✅ = exists in the schema today · 🆕 = proposed (needs a migration)
 | `owner_id` | uuid | ✔ | ✅ | auth | RLS scope |
 | `external_id` | text | | ✅ | import | Unique per owner. **For LinkedIn imports, use the normalized `linkedin_url`** so re-uploads update existing rows |
 | `name` | text | ✔ | ✅ | import / user | |
-| `linkedin_url` | text | | 🆕 | LinkedIn export | Lowercase, no trailing slash. Main identity anchor for enrichment |
-| `email` | text | | 🆕 | LinkedIn export (only when the connection shares it) / vCard | **Private**: never sent to an LLM or Tavily |
-| `phone` | text (E.164) | | 🆕 | vCard / Contact Picker / typed on the card | **Private**: only used for `wa.me/<phone>` and `sms:`. If missing, fall back to `wa.me/?text=` |
-| `source` | text[] | | 🆕 | import | Any of `linkedin_export`, `vcard`, `manual`, `demo` |
+| `linkedin_url` | text | | ✅ | LinkedIn export | Lowercase, no trailing slash. Main identity anchor for enrichment |
+| `email` | text | | ✅ | LinkedIn export (only when the connection shares it) / vCard | **Private**: never sent to an LLM or Tavily |
+| `phone` | text (E.164) | | ✅ | vCard / Contact Picker / typed on the card | **Private**: only used for `wa.me/<phone>` and `sms:`. If missing, fall back to `wa.me/?text=` |
+| `source` | text[] | | ✅ | import | Any of `linkedin_export`, `vcard`, `manual`, `demo` |
 
 ### Professional profile
 
@@ -35,8 +35,8 @@ Status: ✅ = exists in the schema today · 🆕 = proposed (needs a migration)
 | `company` | text | | ✅ | LinkedIn export, user edit wins | On each re-upload |
 | `title` | text | | ✅ | LinkedIn export ("Position") | On each re-upload |
 | `industry` | text | | ✅ | user / Claude guess from title + company | Rarely |
-| `location` | text | | 🆕 | user / enrichment | Metro area only (e.g. "Seattle, WA"), never an address |
-| `profile_history` | jsonb `[{company, title, seen_at}]` | | 🆕 | written by the import diff | Appended when company or title changes. **A change creates a "why now" signal** |
+| `location` | text | | ✅ | user / enrichment | Metro area only (e.g. "Seattle, WA"), never an address |
+| `profile_history` | jsonb `[{company, title, seen_at}]` | | ✅ | written by the import diff | Appended when company or title changes. **A change creates a "why now" signal** |
 
 ### Relationship (written by the user)
 
@@ -45,7 +45,7 @@ Status: ✅ = exists in the schema today · 🆕 = proposed (needs a migration)
 | `relationship_strength` | smallint 1–5 | ✔ | ✅ | onboarding swipe, adjusted by follow-ups | up = 4–5, right = 3, down = 1–2. Below 2 is never proposed for intros |
 | `last_interaction_date` | date | | ✅ | notes / follow-ups | Feeds the "cooling" score |
 | `introduction_preferences` | text | | ✅ | user / extracted from notes | e.g. "No investor intros right now". Matching must respect it |
-| `connected_on` | date | | 🆕 | LinkedIn export | Context only |
+| `connected_on` | date | | ✅ | LinkedIn export | Context only |
 
 ### Outreach state (the deck)
 
@@ -61,7 +61,7 @@ Status: ✅ = exists in the schema today · 🆕 = proposed (needs a migration)
 |---|---|---|---|
 | `enrichment` | jsonb (`Enrichment` in `src/lib/types.ts`) | ✅ | `status`, `identity_confidence` (`high`/`medium` to keep), `summary`, `recent_signals[]`, `possible_offers[]`, `sources[]`. Every item has a `source_url` from the search results |
 | `enriched_at` | timestamptz | ✅ | |
-| `enrichment_stale_after` | interval / derived | 🆕 | Warm contacts (strength ≥3): **14 days**; others: **60 days**; never for `demo`-only rows |
+| refresh cadence | derived (`REFRESH_AFTER_DAYS` in `src/lib/enrich.ts`) | ✅ | Enriched on creation or import, then re-enriched by the daily cron once older than **14 days**. Fictional demo contacts are never refreshed on a schedule (PR #4) |
 
 **Enrichment queries, in priority order** (person-name searches are mostly namesakes for private individuals):
 1. `linkedin_url`, read directly to confirm identity (title, company, location).
@@ -69,6 +69,25 @@ Status: ✅ = exists in the schema today · 🆕 = proposed (needs a migration)
 3. The person's public professional work: `"<name>" <company>` on GitHub, Medium, Substack, YouTube, conference sites.
 
 If identity confidence is `low` or `none`, nothing is stored except `identity_notes`.
+
+### Catch-up assessment (Claude classifier, `src/lib/classify.ts`)
+
+| Field | Type | Status | Notes |
+|---|---|---|---|
+| `outreach_assessment` | jsonb (`OutreachAssessment`) | ✅ | `outreach_value` 0–5, `hook` (`give`/`need`/`news`/`job_change`/`follow_up`/`reconnect`/`none`), `why_now` (≤15 words), `timeliness` 0–5, `confidence` 0–1, `appropriate`, `concern`, `model`, `input_hash` |
+| `outreach_assessed_at` | timestamptz | ✅ | Re-assessed when `input_hash` changes or after 7 days |
+
+**The classifier's input** is built from this contract only: name, title, company, industry, location, relationship strength, last conversation date, last outreach date, intro preferences, open needs, an intro Alonso can offer, a job change in the last 90 days (`profile_history`), the top web signal, the last conversation summary, and the last meeting follow-up with its outcome. **No email or phone.** It uses dates rather than day counts, so the input only changes when the facts do.
+
+**Deck ranking** (`src/lib/catch-up.ts`), computed in code and never stored:
+
+```
+priority = 100 × (0.35·cooling + 0.30·value/5 + 0.15·timeliness/5 + 0.10·strength/5 + 0.10·confidence)
+         × 0.5 if the last meeting follow-up was negative within 90 days
+```
+
+- **Eligibility comes first:** strength ≥2, not snoozed, no outreach in the last 21 days, last conversation ≥30 days ago, and the classifier didn't mark it `appropriate = false`.
+- **Without an assessment** (not yet classified, or Claude unavailable), `value` comes from the reason kinds (give 5, need/job change 3.5, news 2), with timeliness 2.5 and confidence 0.5.
 
 ## 2. `interactions`: notes and meeting follow-ups ✅
 
@@ -79,9 +98,9 @@ If identity confidence is `low` or `none`, nothing is stored except `identity_no
 | `raw_notes` | text | User-written. **Never sent to Tavily** |
 | `context` | jsonb | Claude extraction output: `summary`, `uncertainties[]` (sensitivities, needs that belong to someone else) |
 | `extracted_at` | timestamptz | |
-| `kind` | text 🆕 | `note` · `onboarding_quick_note` · `meeting_followup` |
-| `outcome` | text 🆕 | Follow-ups only: `positive` · `neutral` · `negative`. Labels for tuning the ranking later |
-| `opportunity_id` | uuid 🆕 | Follow-ups only: the intro or catch-up this follow-up is about |
+| `kind` | text ✅ | `note` · `onboarding_quick_note` · `meeting_followup` |
+| `outcome` | text ✅ | Follow-ups only: `positive` · `neutral` · `negative`. Labels for tuning the ranking later |
+| `opportunity_id` | uuid ✅ | Follow-ups only: the intro or catch-up this follow-up is about |
 
 ## 3. `signals`: needs and offers extracted from notes ✅
 
