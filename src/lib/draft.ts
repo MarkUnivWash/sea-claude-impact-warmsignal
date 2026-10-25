@@ -1,4 +1,4 @@
-import { textCall } from "./claude";
+import { FAST_MODEL, textCall } from "./claude";
 import { buildBriefing, type Candidate } from "./briefing";
 import { must, type Ctx } from "./supabase";
 import type { DraftKind } from "./types";
@@ -41,7 +41,7 @@ Both have agreed. Write a 70-120 word double opt-in introduction email addressed
 }
 
 export async function draftOutreach(c: Candidate, kind: DraftKind = draftKindFor(c)): Promise<string> {
-  return textCall({ system: SYSTEM, user: prompt(c, kind) });
+  return textCall({ system: SYSTEM, user: prompt(c, kind), model: FAST_MODEL });
 }
 
 /** Returns the stored draft for the card's current step, generating and saving it if missing. */
