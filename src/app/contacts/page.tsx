@@ -2,7 +2,7 @@ import Link from "next/link";
 import { ChevronRight, Globe, Info, Sparkles, Upload, Wand2 } from "lucide-react";
 import { enrichAllAction, importCsvAction, loadDemoAction, removeDemoAction } from "@/app/actions";
 import { SubmitButton } from "@/components/submit-button";
-import { Avatar, btn, card, Chip, PageHeader, SignalBars } from "@/components/ui";
+import { Avatar, btn, card, Chip, formatDate, PageHeader, SignalBars } from "@/components/ui";
 import { requireCtx } from "@/lib/auth";
 import { hasDemoData } from "@/lib/demo";
 import { must } from "@/lib/supabase";
@@ -55,11 +55,11 @@ export default async function ContactsPage() {
         <span className="flex size-9 items-center justify-center rounded-lg bg-ink-50 text-ink-600">
           <Upload className="size-4" />
         </span>
-        <div className="min-w-0 flex-1">
+        <div className="min-w-[14rem] flex-1">
           <div className="font-semibold text-slate-800">Import from CSV</div>
-          <div className="group relative inline-flex items-center gap-1 text-xs text-slate-500">
+          <div className="group relative text-xs text-slate-500">
             Re-importing updates contacts by contact_id. New contacts are enriched from the public web.
-            <Info className="size-3.5 text-slate-400" />
+            <Info className="ml-1 inline size-3.5 align-[-3px] text-slate-400" />
             <span className="pointer-events-none absolute left-0 top-full z-10 mt-2 hidden w-80 rounded-lg bg-slate-900 px-3 py-2 text-xs leading-relaxed text-white shadow-lg group-hover:block">
               Columns: contact_id, name, company, title, industry, relationship_strength (1–5), last_interaction_date
               (YYYY-MM-DD), introduction_preferences. Only name, title and company are searched (Tavily).
@@ -83,7 +83,7 @@ export default async function ContactsPage() {
             <tr>
               <th className="px-5 py-3 font-medium">Name</th>
               <th className="hidden px-3 py-3 font-medium md:table-cell">Relationship</th>
-              <th className="hidden px-3 py-3 font-medium sm:table-cell">Last spoke</th>
+              <th className="hidden whitespace-nowrap px-3 py-3 font-medium sm:table-cell">Last spoke</th>
               <th className="px-3 py-3 font-medium">Signals</th>
               <th className="hidden px-3 py-3 font-medium lg:table-cell">Web</th>
               <th className="w-8" />
@@ -109,9 +109,9 @@ export default async function ContactsPage() {
                   <td className="hidden px-3 py-3 md:table-cell">
                     <SignalBars value={c.relationship_strength} />
                   </td>
-                  <td className="hidden px-3 py-3 text-slate-500 sm:table-cell">{formatDate(c.last_interaction_date)}</td>
+                  <td className="hidden whitespace-nowrap px-3 py-3 text-slate-500 sm:table-cell">{formatDate(c.last_interaction_date)}</td>
                   <td className="px-3 py-3">
-                    <div className="flex flex-wrap gap-1">
+                    <div className="flex flex-wrap gap-1 xl:flex-nowrap">
                       {needs > 0 && <Chip tone="violet">{needs} need{needs > 1 && "s"}</Chip>}
                       {offers > 0 && <Chip tone="sky">{offers} offer{offers > 1 && "s"}</Chip>}
                       {needs + offers === 0 && <span className="text-slate-300">—</span>}
@@ -142,9 +142,4 @@ export default async function ContactsPage() {
       </div>
     </div>
   );
-}
-
-function formatDate(d: string | null) {
-  if (!d) return "—";
-  return new Date(d + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 }

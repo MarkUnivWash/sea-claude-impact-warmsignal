@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { addNoteAction, enrichContactAction } from "@/app/actions";
 import { SubmitButton } from "@/components/submit-button";
-import { Avatar, btn, card, Chip, input, SignalBars } from "@/components/ui";
+import { Avatar, btn, card, Chip, formatDate, input, SignalBars } from "@/components/ui";
 import { defaultEvalDate } from "@/lib/briefing";
 import { requireCtx } from "@/lib/auth";
 import { must } from "@/lib/supabase";
@@ -72,10 +72,10 @@ export default async function ContactPage({ params }: PageProps<"/contacts/[id]"
               </Chip>
             )}
             <Chip tone="slate">
-              <SignalBars value={contact.relationship_strength} /> Relationship {contact.relationship_strength}/5
+              <SignalBars small value={contact.relationship_strength} /> Relationship {contact.relationship_strength}/5
             </Chip>
             <Chip tone="slate">
-              <Clock className="size-3" /> Last spoke {contact.last_interaction_date ?? "unknown"}
+              <Clock className="size-3" /> Last spoke {formatDate(contact.last_interaction_date)}
             </Chip>
           </div>
         </div>
@@ -127,7 +127,7 @@ export default async function ContactPage({ params }: PageProps<"/contacts/[id]"
                       <CalendarDays className="size-4" />
                     </span>
                     <article className={`${card} min-w-0 flex-1 p-5 text-sm`}>
-                      <div className="text-xs font-semibold uppercase tracking-wider text-slate-400">{it.date}</div>
+                      <div className="text-xs font-semibold uppercase tracking-wider text-slate-400">{formatDate(it.date)}</div>
                       <p className="mt-2 whitespace-pre-wrap leading-relaxed text-slate-700">{it.raw_notes}</p>
                       {it.context?.summary && (
                         <p className="mt-3 rounded-lg bg-ink-50/60 px-3 py-2 text-ink-900">

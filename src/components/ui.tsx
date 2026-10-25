@@ -13,21 +13,12 @@ export const input =
 export const card = "rounded-2xl border border-slate-200/80 bg-white shadow-card";
 
 export function Logo({ size = 28 }: { size?: number }) {
+  // Plain elements rather than SVG gradients: SVG gradient ids collide when the logo renders twice.
   return (
-    <svg width={size * 1.4} height={size} viewBox="0 0 42 30" aria-hidden>
-      <defs>
-        <linearGradient id="ws-a" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#c7d2fe" />
-          <stop offset="1" stopColor="#a5b4fc" />
-        </linearGradient>
-        <linearGradient id="ws-b" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#818cf8" />
-          <stop offset="1" stopColor="#4f46e5" />
-        </linearGradient>
-      </defs>
-      <circle cx="13" cy="15" r="12" fill="url(#ws-a)" />
-      <circle cx="28" cy="15" r="12" fill="url(#ws-b)" fillOpacity="0.92" />
-    </svg>
+    <span aria-hidden className="relative inline-block shrink-0" style={{ width: size * 1.4, height: size }}>
+      <span className="absolute left-0 top-0 rounded-full bg-gradient-to-br from-indigo-200 to-indigo-300" style={{ width: size * 0.84, height: size * 0.84, top: size * 0.08 }} />
+      <span className="absolute right-0 rounded-full bg-gradient-to-br from-indigo-400 to-ink-600 opacity-95" style={{ width: size * 0.84, height: size * 0.84, top: size * 0.08 }} />
+    </span>
   );
 }
 
@@ -88,14 +79,14 @@ export function Chip({
 }
 
 /** Relationship strength 1–5 as phone-style signal bars. */
-export function SignalBars({ value, max = 5 }: { value: number; max?: number }) {
+export function SignalBars({ value, max = 5, small = false }: { value: number; max?: number; small?: boolean }) {
   return (
     <span className="inline-flex items-end gap-[3px]" title={`Relationship ${value}/${max}`}>
       {Array.from({ length: max }, (_, i) => (
         <span
           key={i}
-          className={`w-[4px] rounded-full ${i < value ? "bg-ink-500" : "bg-slate-200"}`}
-          style={{ height: 5 + i * 3 }}
+          className={`rounded-full ${small ? "w-[3px]" : "w-[4px]"} ${i < value ? "bg-ink-500" : "bg-slate-200"}`}
+          style={{ height: small ? 3 + i * 2 : 5 + i * 3 }}
         />
       ))}
     </span>
@@ -123,4 +114,9 @@ export function PageHeader({
       {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
     </header>
   );
+}
+
+export function formatDate(d: string | null | undefined) {
+  if (!d) return "—";
+  return new Date(d + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 }

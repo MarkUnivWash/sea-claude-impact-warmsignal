@@ -31,7 +31,7 @@ export function DraftBox({ draft, label }: { draft: string; label: string }) {
       <textarea
         value={text}
         onChange={(e) => setText(e.target.value)}
-        rows={Math.min(10, Math.max(4, Math.ceil(text.length / 85)))}
+        rows={Math.min(14, Math.max(5, text.split("\n").reduce((n, line) => n + Math.max(1, Math.ceil(line.length / 90)), 0)))}
         className="block w-full resize-y bg-transparent px-4 py-3 text-sm leading-relaxed text-slate-700 outline-none"
       />
     </div>

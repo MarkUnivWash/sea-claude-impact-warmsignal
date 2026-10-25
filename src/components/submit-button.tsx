@@ -25,7 +25,7 @@ export function SubmitButton({
       name={name}
       value={value}
       disabled={pending}
-      className={`inline-flex items-center justify-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium transition active:scale-[0.98] disabled:cursor-wait disabled:opacity-70 ${className}`}
+      className={`inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-lg px-3.5 py-2 text-sm font-medium transition active:scale-[0.98] disabled:cursor-wait disabled:opacity-70 ${className}`}
     >
       {mine ? (
         <>

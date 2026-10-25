@@ -219,10 +219,10 @@ function RecommendationCard({ rank, c, evalDate }: { rank: number; c: Candidate;
           {/* The two people and what flows between them */}
           <div className="grid items-center gap-4 rounded-2xl bg-gradient-to-r from-violet-50/60 via-white to-sky-50/60 p-4 sm:p-5 md:grid-cols-[1fr_auto_1fr]">
             <Person name={c.recipient.name} role={[c.recipient.title, c.recipient.company]}>
-              <Chip tone="violet" className="!text-[13px]">
-                <span className="font-semibold">Needs:</span> {c.need.description}
-                {c.need.is_inferred && <span className="opacity-60">· inferred</span>}
-              </Chip>
+              <NeedChip tone="violet" label="Needs">
+                {c.need.description}
+                {c.need.is_inferred && <span className="opacity-60"> · inferred</span>}
+              </NeedChip>
             </Person>
             <div className="flex justify-center text-ink-500" title={twoWay ? "Helps both people" : undefined}>
               <span className="flex size-10 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-slate-200/70">
@@ -230,9 +230,9 @@ function RecommendationCard({ rank, c, evalDate }: { rank: number; c: Candidate;
               </span>
             </div>
             <Person name={c.proposed.name} role={[c.proposed.title, c.proposed.company]}>
-              <Chip tone="sky" className="!text-[13px]">
-                <span className="font-semibold">Can give:</span> {c.offer?.description ?? "Relevant experience (from profile)"}
-              </Chip>
+              <NeedChip tone="sky" label="Can give">
+                {c.offer?.description ?? "Relevant experience (from profile)"}
+              </NeedChip>
             </Person>
           </div>
 
@@ -295,7 +295,7 @@ function RecommendationCard({ rank, c, evalDate }: { rank: number; c: Candidate;
                   <RefreshCw className="size-3.5" /> Redraft
                 </SubmitButton>
               </form>
-              <form action={setStatusAction} className="ml-auto flex gap-0.5">
+              <form action={setStatusAction} className="flex flex-wrap gap-0.5 sm:ml-auto">
                 <input type="hidden" name="id" value={c.opp.id} />
                 <input type="hidden" name="eval_date" value={evalDate} />
                 <SubmitButton name="status" value="deferred" pendingText="…" className={`!px-2.5 text-xs ${btn.ghost}`}>
@@ -361,6 +361,18 @@ function Person({ name, role, children }: { name: string; role: (string | null)[
   );
 }
 
+function NeedChip({ tone, label, children }: { tone: "violet" | "sky"; label: string; children: React.ReactNode }) {
+  return (
+    <span
+      className={`inline-block rounded-xl px-3 py-1 text-[13px] leading-snug ring-1 ring-inset ${
+        tone === "violet" ? "bg-violet-50 text-violet-900 ring-violet-200/70" : "bg-sky-50 text-sky-900 ring-sky-200/70"
+      }`}
+    >
+      <span className="font-semibold">{label}:</span> {children}
+    </span>
+  );
+}
+
 function Reason({
   icon,
   title,
@@ -405,7 +417,7 @@ function Stepper({ current, labels }: { current: number; labels: string[] }) {
               >
                 {done ? <Check className="size-2.5" strokeWidth={3} /> : n}
               </span>
-              <span className="max-w-24 truncate">{label}</span>
+              <span className={`max-w-24 truncate ${active ? "" : "hidden sm:inline"}`}>{label}</span>
             </span>
           </li>
         );

@@ -41,7 +41,8 @@ function AppShell({ email, children }: { email: string; children: React.ReactNod
   );
   return (
     <div className="flex min-h-screen">
-      <aside className="sticky top-0 hidden h-screen w-64 shrink-0 flex-col border-r border-slate-200/70 bg-white px-5 py-7 lg:flex">
+      <div className="hidden w-64 shrink-0 border-r border-slate-200/70 bg-white lg:block">
+      <aside className="sticky top-0 flex h-screen flex-col px-5 py-7">
         <Link href="/" className="flex items-center gap-2.5 px-2 text-xl font-bold tracking-tight text-slate-950">
           <Logo /> WarmSignal
         </Link>
@@ -61,13 +62,14 @@ function AppShell({ email, children }: { email: string; children: React.ReactNod
           </button>
         </form>
       </aside>
+      </div>
 
       <div className="min-w-0 flex-1">
         <header className="sticky top-0 z-10 flex items-center gap-2 border-b border-slate-200/70 bg-white/80 px-4 py-3 backdrop-blur lg:hidden">
-          <Link href="/" className="mr-2 flex items-center gap-2 font-bold tracking-tight">
-            <Logo size={20} /> WarmSignal
+          <Link href="/" className="mr-1 flex shrink-0 items-center gap-2 font-bold tracking-tight">
+            <Logo size={20} /> <span className="hidden sm:inline">WarmSignal</span>
           </Link>
-          <nav className="flex gap-1 [&_a]:px-2.5 [&_a]:py-1.5 [&_a]:text-sm">{nav}</nav>
+          <nav className="flex gap-1 [&_a]:gap-2 [&_a]:px-2.5 [&_a]:py-1.5 [&_a]:text-sm">{nav}</nav>
           <div className="ml-auto">
             <AddContactModal defaultDate={defaultEvalDate()} compact />
           </div>
@@ -84,24 +86,9 @@ function AppShell({ email, children }: { email: string; children: React.ReactNod
 /** Soft indigo wave in the top-right corner, behind page content. */
 function Glow() {
   return (
-    <svg
-      aria-hidden
-      className="pointer-events-none absolute -top-10 right-0 h-[320px] w-[min(720px,70%)]"
-      viewBox="0 0 720 320"
-      preserveAspectRatio="none"
-    >
-      <defs>
-        <linearGradient id="glow" x1="0" y1="1" x2="1" y2="0">
-          <stop offset="0" stopColor="#eef2ff" stopOpacity="0" />
-          <stop offset="0.6" stopColor="#e0e7ff" stopOpacity="0.9" />
-          <stop offset="1" stopColor="#c7d2fe" />
-        </linearGradient>
-        <filter id="glow-blur">
-          <feGaussianBlur stdDeviation="18" />
-        </filter>
-      </defs>
-      <path d="M120 320 C 300 300, 420 160, 560 80 S 720 0, 760 -20 L 760 320 Z" fill="url(#glow)" filter="url(#glow-blur)" />
-      <path d="M300 320 C 450 290, 560 190, 650 110 S 740 40, 760 30" fill="none" stroke="#c7d2fe" strokeOpacity="0.6" strokeWidth="1.5" />
-    </svg>
+    <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-[480px] overflow-hidden">
+      <div className="absolute -right-24 -top-48 h-[420px] w-[640px] rotate-[-12deg] rounded-full bg-gradient-to-bl from-indigo-200/80 via-violet-100/60 to-transparent blur-3xl" />
+      <div className="absolute -top-24 right-56 h-[260px] w-[420px] rounded-full bg-sky-100/50 blur-3xl" />
+    </div>
   );
 }
