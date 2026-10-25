@@ -1,6 +1,6 @@
 import { tavily, type TavilySearchResponse } from "@tavily/core";
 import { z } from "zod";
-import { structuredCall } from "./claude";
+import { structuredCall, structuredStream } from "./claude";
 import { must, type Ctx } from "./supabase";
 import type { Contact, Enrichment } from "./types";
 
@@ -42,20 +42,45 @@ function search() {
   return (client ??= tavily({ apiKey }));
 }
 
-export async function enrichContact(contact: Contact): Promise<Enrichment> {
+/** Progress reported while enriching, for live UIs. `partial` is Claude's unfinished output: display only. */
+export type EnrichEvent =
+  | { type: "searching"; queries: { group: "person" | "company"; query: string }[] }
+  | { type: "sources"; group: "person" | "company"; sources: { title: string; url: string; date: string | null }[] }
+  | { type: "reading"; count: number }
+  | { type: "partial"; data: unknown }
+  | { type: "verifying" }
+  | { type: "result"; enrichment: Enrichment };
+
+export async function enrichContact(
+  contact: Contact,
+  opts: { onEvent?: (e: EnrichEvent) => void; signal?: AbortSignal } = {},
+): Promise<Enrichment> {
+  const emit = opts.onEvent ?? (() => {});
   const t = search();
+  const personQuery = `"${contact.name}" ${contact.title ?? ""} ${contact.company ?? ""}`.trim();
+  const companyQuery = contact.company ? `"${contact.company}" ${contact.industry ?? ""} news` : null;
+  emit({
+    type: "searching",
+    queries: [
+      { group: "person", query: personQuery },
+      ...(companyQuery ? [{ group: "company" as const, query: companyQuery }] : []),
+    ],
+  });
+  // Report each search as soon as it returns, rather than waiting for both.
+  const reported = (group: "person" | "company") => (res: Pick<TavilySearchResponse, "results">) => {
+    emit({
+      type: "sources",
+      group,
+      sources: res.results.map((r) => ({ title: r.title, url: r.url, date: r.publishedDate || null })),
+    });
+    return res;
+  };
   const [person, company] = await Promise.all([
-    t.search(`"${contact.name}" ${contact.title ?? ""} ${contact.company ?? ""}`.trim(), {
-      searchDepth: "basic",
-      maxResults: 5,
-    }),
-    contact.company
-      ? t.search(`"${contact.company}" ${contact.industry ?? ""} news`, {
-          searchDepth: "basic",
-          topic: "news",
-          timeRange: "year",
-          maxResults: 5,
-        })
+    t.search(personQuery, { searchDepth: "basic", maxResults: 5 }).then(reported("person")),
+    companyQuery
+      ? t
+          .search(companyQuery, { searchDepth: "basic", topic: "news", timeRange: "year", maxResults: 5 })
+          .then(reported("company"))
       : Promise.resolve({ results: [] as TavilySearchResponse["results"] }),
   ]);
 
@@ -63,10 +88,13 @@ export async function enrichContact(contact: Contact): Promise<Enrichment> {
     (r, i, all) => all.findIndex((x) => x.url === r.url) === i,
   );
   if (results.length === 0) {
-    return { status: "no_confident_match", identity_notes: "No web results found." };
+    const none: Enrichment = { status: "no_confident_match", identity_notes: "No web results found." };
+    emit({ type: "result", enrichment: none });
+    return none;
   }
 
-  const out = await structuredCall({
+  emit({ type: "reading", count: results.length });
+  const call = {
     system: SYSTEM,
     user: `Contact: ${contact.name}, ${contact.title ?? "?"} at ${contact.company ?? "?"} (${contact.industry ?? "?"})
 
@@ -76,11 +104,17 @@ ${results
   .join("\n")}
 </search_results>`,
     schema: EnrichmentSchema,
-    effort: "low",
-  });
+    effort: "low" as const,
+  };
+  const out = opts.onEvent
+    ? await structuredStream({ ...call, signal: opts.signal, onPartial: (data) => emit({ type: "partial", data }) })
+    : await structuredCall(call);
 
+  emit({ type: "verifying" });
   if (out.identity_confidence === "low" || out.identity_confidence === "none") {
-    return { status: "no_confident_match", identity_notes: out.identity_notes };
+    const none: Enrichment = { status: "no_confident_match", identity_notes: out.identity_notes };
+    emit({ type: "result", enrichment: none });
+    return none;
   }
   // Drop anything not traceable to a returned source.
   const urls = new Set(results.map((r) => r.url));
@@ -88,7 +122,7 @@ ${results
   const recent_signals = cited(out.recent_signals);
   const possible_offers = cited(out.possible_offers);
   const usedUrls = new Set([...recent_signals, ...possible_offers].map((x) => x.source_url));
-  return {
+  const enrichment: Enrichment = {
     status: "matched",
     identity_confidence: out.identity_confidence,
     identity_notes: out.identity_notes,
@@ -97,14 +131,21 @@ ${results
     possible_offers,
     sources: results.filter((r) => usedUrls.has(r.url) || usedUrls.size === 0).slice(0, 5).map((r) => ({ title: r.title, url: r.url })),
   };
+  emit({ type: "result", enrichment });
+  return enrichment;
 }
 
-export async function enrichAndSave(ctx: Ctx, contactId: string): Promise<Enrichment> {
+export async function enrichAndSave(
+  ctx: Ctx,
+  contactId: string,
+  opts: Parameters<typeof enrichContact>[1] = {},
+): Promise<Enrichment> {
   const { db: supabase, ownerId } = ctx;
   const contact = must<Contact>(
     await supabase.from("contacts").select("*").eq("owner_id", ownerId).eq("id", contactId).single(),
   );
-  const enrichment = await enrichContact(contact);
+  // Only the final, identity-gated result is saved; partial output never reaches the database.
+  const enrichment = await enrichContact(contact, opts);
   must(
     await supabase
       .from("contacts")

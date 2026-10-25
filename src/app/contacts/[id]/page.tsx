@@ -7,15 +7,14 @@ import {
   CalendarDays,
   Clock,
   ExternalLink,
-  Globe,
   HandHeart,
   Hand,
   MessageSquareText,
-  RefreshCw,
   ShieldAlert,
   Sparkles,
 } from "lucide-react";
-import { addNoteAction, enrichContactAction } from "@/app/actions";
+import { addNoteAction } from "@/app/actions";
+import { EnrichPanel } from "@/components/enrich-panel";
 import { SubmitButton } from "@/components/submit-button";
 import { Avatar, btn, card, Chip, formatDate, input, SignalBars } from "@/components/ui";
 import { defaultEvalDate } from "@/lib/briefing";
@@ -196,24 +195,11 @@ function SignalList({ title, tone, items }: { title: string; tone: "violet" | "s
 function WebProfile({ contact }: { contact: Contact }) {
   const e: Enrichment | null = contact.enrichment;
   return (
-    <section className={`${card} p-5 text-sm lg:sticky lg:top-6`}>
-      <div className="flex items-start justify-between gap-2">
-        <div>
-          <h2 className="flex items-center gap-2 font-bold tracking-tight">
-            <Globe className="size-4 text-ink-500" /> Public web profile
-          </h2>
-          <p className="text-xs text-slate-400">via Tavily · unverified</p>
-        </div>
-        <form action={enrichContactAction}>
-          <input type="hidden" name="contact_id" value={contact.id} />
-          <SubmitButton pendingText="Searching…" className={`${btn.secondary} !px-2.5 !py-1.5 text-xs`}>
-            <RefreshCw className="size-3.5" /> {contact.enriched_at ? "Refresh" : "Enrich"}
-          </SubmitButton>
-        </form>
-      </div>
+    <EnrichPanel contactId={contact.id} name={contact.name} company={contact.company} enriched={!!contact.enriched_at}>
       {!e && (
         <p className="mt-4 text-slate-500">
-          Not enriched yet. New contacts are enriched in the background, so refresh in a few seconds.
+          Not enriched yet. New contacts are enriched in the background; click <span className="font-medium">Enrich now</span>{" "}
+          to watch it happen live.
         </p>
       )}
       {e?.status === "no_confident_match" && (
@@ -262,6 +248,6 @@ function WebProfile({ contact }: { contact: Contact }) {
           )}
         </div>
       )}
-    </section>
+    </EnrichPanel>
   );
 }
