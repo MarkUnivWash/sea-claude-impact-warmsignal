@@ -33,8 +33,14 @@ export default async function ContactPage({ params }: PageProps<"/contacts/[id]"
         </Link>
         <h1 className="font-serif text-3xl font-semibold">{contact.name}</h1>
         <p className="text-stone-600">
-          {contact.title}, {contact.company} · {contact.industry} · relationship {contact.relationship_strength}/5 · last
-          interaction {contact.last_interaction_date ?? "unknown"}
+          {[
+            [contact.title, contact.company].filter(Boolean).join(", "),
+            contact.industry,
+            `relationship ${contact.relationship_strength}/5`,
+            `last interaction ${contact.last_interaction_date ?? "unknown"}`,
+          ]
+            .filter(Boolean)
+            .join(" · ")}
         </p>
         {contact.introduction_preferences && (
           <p className="mt-2 rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-900">
@@ -142,7 +148,11 @@ function WebProfile({ contact }: { contact: Contact }) {
           </SubmitButton>
         </form>
       </div>
-      {!e && <p className="mt-2 text-stone-500">Not enriched yet.</p>}
+      {!e && (
+        <p className="mt-2 text-stone-500">
+          Not enriched yet. New contacts are enriched in the background, so refresh in a few seconds.
+        </p>
+      )}
       {e?.status === "no_confident_match" && (
         <p className="mt-2 text-stone-500">No confident match found online. {e.identity_notes}</p>
       )}

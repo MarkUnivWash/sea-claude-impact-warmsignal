@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Newsreader } from "next/font/google";
 import Link from "next/link";
+import { AddContactModal } from "@/components/add-contact-modal";
+import { defaultEvalDate } from "@/lib/briefing";
 import "./globals.css";
 
 const sans = Geist({ variable: "--font-sans-face", subsets: ["latin"] });
@@ -26,6 +28,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <Link href="/contacts" className="text-sm text-stone-600 hover:text-stone-900">
               Contacts
             </Link>
+            <AddContactModal defaultDate={defaultEvalDate()} />
           </nav>
         </header>
         <main className="mx-auto max-w-4xl px-6 py-8">{children}</main>

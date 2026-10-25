@@ -58,7 +58,7 @@ export async function buildBriefing(evalDate: string): Promise<Briefing> {
         need,
         offer,
         score: scoreOpportunity({ opp, recipient, proposed, need, needDate: need.note_date, evalDate }),
-        excludedReason: ineligibleReason(opp, need, need.note_date, evalDate),
+        excludedReason: ineligibleReason(opp, need, need.note_date, evalDate, proposed),
         reciprocal: [],
       },
     ];

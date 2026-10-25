@@ -113,8 +113,19 @@ export function scoreOpportunity(input: {
 /** PRD §5.8 eligibility. Returns the reason a candidate is excluded, or null if eligible. */
 export const STALE_AFTER_DAYS = 270;
 
-export function ineligibleReason(opp: Opportunity, need: Signal, needDate: string, evalDate: string): string | null {
+/** Below this, Alonso doesn't know the person well enough to vouch for an intro to them. */
+export const MIN_PROPOSED_STRENGTH = 2;
+
+export function ineligibleReason(
+  opp: Opportunity,
+  need: Signal,
+  needDate: string,
+  evalDate: string,
+  proposed: Contact,
+): string | null {
   if (opp.give_value < MIN_GIVE_VALUE) return `Give Value ${opp.give_value}/5 is below the ${MIN_GIVE_VALUE}/5 minimum`;
+  if (proposed.relationship_strength < MIN_PROPOSED_STRENGTH)
+    return `No plausible relationship path: Alonso doesn't know ${proposed.name} well enough (${proposed.relationship_strength}/5)`;
   if (!opp.appropriate) return `Flagged as inappropriate${opp.concerns ? `: ${opp.concerns}` : ""}`;
   if (need.status !== "active") return `Need is ${need.status}`;
   if (need.relevant_until && need.relevant_until < evalDate) return `Need expired on ${need.relevant_until}`;

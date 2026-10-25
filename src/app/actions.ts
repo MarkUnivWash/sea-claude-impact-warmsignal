@@ -38,6 +38,44 @@ export async function importCsvAction(formData: FormData) {
   revalidatePath("/contacts");
 }
 
+export type CreateContactState = { error: string | null };
+
+/** Manual contact entry (modal). Optionally logs a first conversation, then enriches in the background. */
+export async function createContactAction(_prev: CreateContactState, formData: FormData): Promise<CreateContactState> {
+  const text = (key: string) => String(formData.get(key) ?? "").trim() || null;
+  const name = text("name");
+  if (!name) return { error: "Name is required" };
+  if (formData.get("consent") !== "on") return { error: "Confirm this person is OK being added" };
+
+  const id = `c-${Date.now().toString(36)}`;
+  const strength = Number(formData.get("relationship_strength"));
+  const { error } = await db()
+    .from("contacts")
+    .insert({
+      id,
+      name,
+      company: text("company"),
+      title: text("title"),
+      industry: text("industry"),
+      relationship_strength: strength >= 1 && strength <= 5 ? strength : 3,
+      last_interaction_date: text("last_interaction_date"),
+      introduction_preferences: text("introduction_preferences"),
+    });
+  if (error) return { error: error.message };
+
+  const notes = text("notes");
+  if (notes) {
+    try {
+      await ingestNote(id, text("last_interaction_date") ?? defaultEvalDate(), notes);
+    } catch (e) {
+      return { error: `Contact saved, but note extraction failed: ${(e as Error).message}` };
+    }
+  }
+  after(() => enrichAndSave(id).catch((e) => console.error(`Enrichment failed for ${id}:`, e)));
+  revalidatePath("/contacts");
+  redirect(`/contacts/${id}`);
+}
+
 export async function enrichContactAction(formData: FormData) {
   const id = String(formData.get("contact_id"));
   await enrichAndSave(id);

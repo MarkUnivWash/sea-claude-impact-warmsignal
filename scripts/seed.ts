@@ -19,7 +19,9 @@ async function main() {
   }
 
   const n = await importContactsCsv(readFileSync("data/contacts.csv", "utf8"));
-  console.log(`Imported ${n} contacts`);
+  // Real public figures, enrichment demo only: no notes, strength 1, never introduced.
+  const pub = await importContactsCsv(readFileSync("data/public_figures.csv", "utf8"));
+  console.log(`Imported ${n} contacts + ${pub} public figures`);
 
   const notes: { contact_id: string; date: string; notes: string }[] = JSON.parse(
     readFileSync("data/notes.json", "utf8"),
