@@ -1,4 +1,4 @@
-import { textCall } from "./claude";
+import { FAST_MODEL, textCall } from "./claude";
 import { buildBriefing, type Briefing } from "./briefing";
 import { coolingScore, daysBetween, MIN_PROPOSED_STRENGTH, STALE_AFTER_DAYS } from "./scoring";
 import { must, type Ctx } from "./supabase";
@@ -157,7 +157,7 @@ export async function getOrCreateCatchUpDraft(ctx: Ctx, contactId: string, evalD
 
   const inputs = await loadInputs(ctx, evalDate);
   const card = toCard(contact, reasonsFor(contact, inputs, evalDate), evalDate);
-  const outreach_draft = await textCall({ system: SYSTEM, user: prompt(card, contact) });
+  const outreach_draft = await textCall({ system: SYSTEM, user: prompt(card, contact), model: FAST_MODEL });
   must(await db.from("contacts").update({ outreach_draft }).eq("owner_id", ownerId).eq("id", contactId));
   return outreach_draft;
 }
