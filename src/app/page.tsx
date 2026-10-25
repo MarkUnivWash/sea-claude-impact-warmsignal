@@ -1,7 +1,32 @@
 import { Suspense } from "react";
-import { advanceAction, findIntroductionsAction, redraftAction, setEvalDateAction, setStatusAction } from "@/app/actions";
+import {
+  ArrowLeftRight,
+  ArrowRight,
+  BadgeCheck,
+  CalendarClock,
+  Check,
+  ChevronDown,
+  CircleAlert,
+  Filter,
+  Layers,
+  RefreshCw,
+  Send,
+  Sparkles,
+  TrendingUp,
+  TriangleAlert,
+} from "lucide-react";
+import {
+  advanceAction,
+  findIntroductionsAction,
+  loadDemoAction,
+  redraftAction,
+  setEvalDateAction,
+  setStatusAction,
+} from "@/app/actions";
 import { DraftBox } from "@/components/draft-box";
 import { SubmitButton } from "@/components/submit-button";
+import { Avatar, btn, card, Chip, Logo, PageHeader } from "@/components/ui";
+import { requireCtx } from "@/lib/auth";
 import { buildBriefing, defaultEvalDate, type Candidate } from "@/lib/briefing";
 import { draftKindFor, getOrCreateDraft } from "@/lib/draft";
 import { WEIGHTS } from "@/lib/scoring";
@@ -12,96 +37,144 @@ export const maxDuration = 300;
 export default async function BriefingPage({ searchParams }: PageProps<"/">) {
   const { date } = await searchParams;
   const evalDate = typeof date === "string" && /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : defaultEvalDate();
-  const briefing = await buildBriefing(evalDate);
+  const ctx = await requireCtx();
+  const { count: contactCount } = await ctx.db
+    .from("contacts")
+    .select("id", { count: "exact", head: true })
+    .eq("owner_id", ctx.ownerId);
+  if (!contactCount) return <Welcome />;
+
+  const briefing = await buildBriefing(ctx, evalDate);
   const n = briefing.recommendations.length;
 
   return (
     <div className="space-y-8">
-      <section className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="text-sm uppercase tracking-wide text-stone-500">
-            {new Date(evalDate + "T12:00:00").toLocaleDateString("en-US", {
-              weekday: "long",
-              month: "long",
-              day: "numeric",
-              year: "numeric",
-            })}
-          </p>
-          <h1 className="font-serif text-3xl font-semibold">
-            {n === 0 ? "No opportunities to give today" : `Your ${n} ${n === 1 ? "opportunity" : "opportunities"} to give today`}
-          </h1>
-        </div>
-        <div className="flex items-center gap-2">
-          <form action={setEvalDateAction} className="flex items-center gap-1">
-            <input
-              type="date"
-              name="date"
-              defaultValue={evalDate}
-              className="rounded-md border border-stone-300 bg-white px-2 py-1 text-sm"
-            />
-            <SubmitButton className="border border-stone-300 bg-white hover:bg-stone-100">Go</SubmitButton>
-          </form>
-          <form action={findIntroductionsAction}>
-            <input type="hidden" name="eval_date" value={evalDate} />
-            <SubmitButton
-              pendingText="Claude is reviewing your network…"
-              className="bg-amber-600 text-white hover:bg-amber-700"
-            >
-              Find introductions
-            </SubmitButton>
-          </form>
-        </div>
-      </section>
+      <PageHeader
+        eyebrow={new Date(evalDate + "T12:00:00").toLocaleDateString("en-US", {
+          weekday: "short",
+          month: "short",
+          day: "numeric",
+        })}
+        title={n === 0 ? "No introductions today" : `Your ${n} ${n === 1 ? "introduction" : "introductions"} for today`}
+        subtitle="High-leverage opportunities to create value for your network."
+        actions={
+          <>
+            <form action={setEvalDateAction} className="flex items-center rounded-lg border border-slate-200 bg-white/80 shadow-sm backdrop-blur">
+              <input
+                type="date"
+                name="date"
+                defaultValue={evalDate}
+                aria-label="Briefing date"
+                className="bg-transparent py-2 pl-3 pr-1 text-sm text-slate-700 outline-none"
+              />
+              <SubmitButton className="!rounded-l-none border-l border-slate-200 !px-3 text-slate-600 hover:bg-slate-50">
+                Go
+              </SubmitButton>
+            </form>
+            <form action={findIntroductionsAction}>
+              <input type="hidden" name="eval_date" value={evalDate} />
+              <SubmitButton pendingText="Claude is reviewing your network…" className={btn.primary}>
+                <Sparkles className="size-4" /> Find introductions
+              </SubmitButton>
+            </form>
+          </>
+        }
+      />
 
       {n === 0 && (
-        <p className="rounded-lg border border-dashed border-stone-300 p-6 text-stone-600">
-          Nothing qualifies right now. That&apos;s fine: WarmSignal never pads the list. Log new conversations on the
-          Contacts page, then click <em>Find introductions</em>.
-        </p>
+        <div className={`${card} flex flex-col items-center px-6 py-14 text-center`}>
+          <div className="flex size-14 items-center justify-center rounded-2xl bg-ink-50 text-ink-600">
+            <Sparkles className="size-6" />
+          </div>
+          <h2 className="mt-4 text-lg font-semibold text-slate-900">Nothing qualifies right now</h2>
+          <p className="mt-1 max-w-md text-sm text-slate-500">
+            That&apos;s fine: WarmSignal never pads the list. Log new conversations on the Contacts page, then click{" "}
+            <span className="font-medium text-slate-700">Find introductions</span>.
+          </p>
+        </div>
       )}
 
-      <ol className="space-y-5">
+      <ol className="space-y-4">
         {briefing.recommendations.map((c, i) => (
           <RecommendationCard key={c.opp.id} rank={i + 1} c={c} evalDate={evalDate} />
         ))}
       </ol>
 
-      {briefing.alsoConsidered.length > 0 && (
-        <details className="rounded-lg border border-stone-200 bg-white p-4">
-          <summary className="cursor-pointer text-sm font-medium text-stone-700">
-            Also eligible ({briefing.alsoConsidered.length}): lower-ranked or a second option for someone above
-          </summary>
-          <ul className="mt-3 space-y-2 text-sm">
-            {briefing.alsoConsidered.map((c) => (
-              <li key={c.opp.id} className="flex justify-between gap-4">
-                <span>
-                  {c.recipient.name} ← {c.proposed.name}: {c.need.description}
-                </span>
-                <span className="font-mono text-stone-500">{c.score.total}</span>
-              </li>
-            ))}
-          </ul>
-        </details>
-      )}
-
-      {briefing.filteredOut.length > 0 && (
-        <details className="rounded-lg border border-stone-200 bg-white p-4">
-          <summary className="cursor-pointer text-sm font-medium text-stone-700">
-            Filtered out ({briefing.filteredOut.length}): why these weren&apos;t recommended
-          </summary>
-          <ul className="mt-3 space-y-3 text-sm">
-            {briefing.filteredOut.map((c) => (
-              <li key={c.opp.id}>
-                <div>
-                  {c.recipient.name} ← {c.proposed.name}: {c.need.description}
-                </div>
-                <div className="text-stone-500">{c.excludedReason}</div>
-              </li>
-            ))}
-          </ul>
-        </details>
+      {(briefing.alsoConsidered.length > 0 || briefing.filteredOut.length > 0) && (
+        <div className="grid gap-4 pt-2 md:grid-cols-2">
+          {briefing.alsoConsidered.length > 0 && (
+            <Disclosure
+              icon={<Layers className="size-4" />}
+              title={`Also eligible (${briefing.alsoConsidered.length})`}
+              hint="Lower-ranked, or a second option for someone above"
+            >
+              <ul className="divide-y divide-slate-100">
+                {briefing.alsoConsidered.map((c) => (
+                  <li key={c.opp.id} className="flex items-center justify-between gap-4 py-2.5">
+                    <span className="min-w-0">
+                      <span className="font-medium text-slate-800">
+                        {c.recipient.name} <ArrowLeftRight className="inline size-3 text-slate-400" /> {c.proposed.name}
+                      </span>
+                      <span className="block truncate text-slate-500">{c.need.description}</span>
+                    </span>
+                    <span className="shrink-0 rounded-md bg-slate-100 px-2 py-0.5 font-mono text-xs text-slate-600">
+                      {Math.round(c.score.total)}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </Disclosure>
+          )}
+          {briefing.filteredOut.length > 0 && (
+            <Disclosure
+              icon={<Filter className="size-4" />}
+              title={`Filtered out (${briefing.filteredOut.length})`}
+              hint="Why these weren't recommended"
+            >
+              <ul className="divide-y divide-slate-100">
+                {briefing.filteredOut.map((c) => (
+                  <li key={c.opp.id} className="py-2.5">
+                    <div className="font-medium text-slate-800">
+                      {c.recipient.name} <ArrowLeftRight className="inline size-3 text-slate-400" /> {c.proposed.name}
+                    </div>
+                    <div className="text-slate-500">{c.need.description}</div>
+                    <div className="mt-1 flex items-start gap-1.5 text-xs text-amber-700">
+                      <CircleAlert className="mt-px size-3.5 shrink-0" /> {c.excludedReason}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </Disclosure>
+          )}
+        </div>
       )}
     </div>
+  );
+}
+
+function Disclosure({
+  icon,
+  title,
+  hint,
+  children,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  hint: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <details className={`group ${card} self-start`}>
+      <summary className="flex cursor-pointer items-center gap-3 px-5 py-4">
+        <span className="flex size-8 items-center justify-center rounded-lg bg-slate-100 text-slate-500">{icon}</span>
+        <span className="flex-1">
+          <span className="block text-sm font-semibold text-slate-800">{title}</span>
+          <span className="block text-xs text-slate-500">{hint}</span>
+        </span>
+        <ChevronDown className="size-4 text-slate-400 transition group-open:rotate-180" />
+      </summary>
+      <div className="border-t border-slate-100 px-5 pb-3 text-sm">{children}</div>
+    </details>
   );
 }
 
@@ -112,138 +185,284 @@ function RecommendationCard({ rank, c, evalDate }: { rank: number; c: Candidate;
   const p = first(c.proposed.name);
   const kind = draftKindFor(c);
   const step = {
-    ask_recipient: { n: 1, label: `Ask ${r} if they want the intro`, yes: "recipient_yes", yesLabel: `${r} said yes →` },
-    ask_proposed: { n: 2, label: `Check ${p} is open to it`, yes: "proposed_yes", yesLabel: `${p} said yes →` },
-    intro: { n: 3, label: `Introduce ${r} and ${p}`, yes: "intro_sent", yesLabel: "Intro sent ✓" },
+    ask_recipient: { n: 1, label: `Ask ${r} if they want the intro`, yes: "recipient_yes", yesLabel: `${r} said yes` },
+    ask_proposed: { n: 2, label: `Check ${p} is open to it`, yes: "proposed_yes", yesLabel: `${p} said yes` },
+    intro: { n: 3, label: `Introduce ${r} and ${p}`, yes: "intro_sent", yesLabel: "Mark intro sent" },
   }[kind];
+  const twoWay = c.reciprocal.length > 0;
+  const whyNow =
+    c.opp.why_now ??
+    (c.score.daysSinceInteraction != null ? `You haven't connected in ${c.score.daysSinceInteraction} days.` : null);
 
   return (
-    <li className="rounded-xl border border-stone-200 bg-white p-5 shadow-sm">
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <h2 className="font-serif text-lg font-semibold leading-snug">
-            {rank}. Introduce {c.recipient.name} → {c.proposed.name}
-          </h2>
-          <p className="text-xs text-stone-500">
-            {c.recipient.title}, {c.recipient.company} · {c.proposed.title}, {c.proposed.company}
-          </p>
-        </div>
-        <div className="shrink-0 rounded-full bg-amber-100 px-2.5 py-0.5 font-mono text-sm font-semibold text-amber-800">
-          {Math.round(c.score.total)}
-        </div>
-      </div>
+    <li className="animate-rise" style={{ animationDelay: `${(rank - 1) * 70}ms` }}>
+      <details
+        name="briefing"
+        open={rank === 1}
+        className={`group ${card} transition hover:shadow-card-lg open:shadow-card-lg`}
+      >
+        <summary className="flex cursor-pointer items-center gap-4 px-5 py-4 sm:px-6">
+          <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-ink-50 text-lg font-bold text-ink-700">
+            {rank}
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-lg font-bold tracking-tight text-slate-950 group-open:text-xl">
+              Introduce {r} to {p}
+            </span>
+            <span className="block truncate text-sm text-slate-500 group-open:hidden">{c.opp.why_proposed}</span>
+          </span>
+          <ScorePill score={c.score.total} />
+          <ChevronDown className="size-5 shrink-0 text-slate-400 transition group-open:rotate-180" />
+        </summary>
 
-      <ul className="mt-3 space-y-1 text-sm">
-        <li>
-          <span className="font-medium">{r} needs:</span> {c.need.description}
-          {c.need.is_inferred && <Badge>inferred</Badge>}
-        </li>
-        <li>
-          <span className="font-medium">Why {p}:</span> {c.opp.why_proposed}
-          {c.opp.match_basis === "profile_inference" && <Badge>profile only</Badge>}
-        </li>
-        {c.reciprocal.length > 0 && (
-          <li>
-            <span className="font-medium">Two-way:</span> helps {p} too ({c.reciprocal[0].need.description})
-          </li>
-        )}
-        {c.opp.why_now && (
-          <li>
-            <span className="font-medium">Why now:</span> {c.opp.why_now}
-          </li>
-        )}
-        {c.opp.concerns && (
-          <li className="text-amber-800">
-            <span className="font-medium">⚠</span> {c.opp.concerns}
-          </li>
-        )}
-      </ul>
+        <div className="space-y-6 px-5 pb-6 sm:px-6">
+          {/* The two people and what flows between them */}
+          <div className="grid items-center gap-4 rounded-2xl bg-gradient-to-r from-violet-50/60 via-white to-sky-50/60 p-4 sm:p-5 md:grid-cols-[1fr_auto_1fr]">
+            <Person name={c.recipient.name} role={[c.recipient.title, c.recipient.company]}>
+              <Chip tone="violet" className="!text-[13px]">
+                <span className="font-semibold">Needs:</span> {c.need.description}
+                {c.need.is_inferred && <span className="opacity-60">· inferred</span>}
+              </Chip>
+            </Person>
+            <div className="flex justify-center text-ink-500" title={twoWay ? "Helps both people" : undefined}>
+              <span className="flex size-10 items-center justify-center rounded-full bg-white shadow-sm ring-1 ring-slate-200/70">
+                {twoWay ? <ArrowLeftRight className="size-5" /> : <ArrowRight className="size-5" />}
+              </span>
+            </div>
+            <Person name={c.proposed.name} role={[c.proposed.title, c.proposed.company]}>
+              <Chip tone="sky" className="!text-[13px]">
+                <span className="font-semibold">Can give:</span> {c.offer?.description ?? "Relevant experience (from profile)"}
+              </Chip>
+            </Person>
+          </div>
 
-      <div className="mt-4">
-        <div className="mb-2 flex items-center gap-2 text-sm">
-          <span className="rounded-full bg-stone-900 px-2 py-0.5 text-xs font-medium text-white">Step {step.n}/3</span>
-          <span className="font-medium">{step.label}</span>
-        </div>
-        <Suspense
-          fallback={<div className="h-28 animate-pulse rounded-lg bg-amber-50 p-3 text-sm text-amber-800">Drafting message…</div>}
-        >
-          <Draft c={c} label={kind === "intro" ? `To ${r} & ${p}` : `To ${kind === "ask_recipient" ? r : p}`} />
-        </Suspense>
-      </div>
+          <div className="grid gap-6 md:grid-cols-2 md:divide-x md:divide-slate-100">
+            <Reason icon={<Sparkles className="size-5" />} title="Why this is a great match">
+              {c.opp.why_proposed}
+              {c.opp.match_basis === "profile_inference" && (
+                <Chip tone="slate" className="ml-2 align-middle">
+                  profile only
+                </Chip>
+              )}
+              {twoWay && (
+                <span className="mt-2 block text-ink-700">
+                  <span className="font-medium">Two-way:</span> helps {p} too ({c.reciprocal[0].need.description}).
+                </span>
+              )}
+            </Reason>
+            {whyNow && (
+              <Reason icon={<CalendarClock className="size-5" />} title="Why now" className="md:pl-6">
+                {whyNow}
+              </Reason>
+            )}
+          </div>
 
-      <div className="mt-3 flex flex-wrap items-center gap-2">
-        <form action={advanceAction} className="flex gap-2">
-          <input type="hidden" name="id" value={c.opp.id} />
-          <SubmitButton name="step" value={step.yes} className="bg-emerald-600 text-white hover:bg-emerald-700">
-            {step.yesLabel}
-          </SubmitButton>
-          {kind !== "intro" && (
-            <SubmitButton name="step" value="declined" className="text-stone-500 hover:bg-stone-100">
-              Not interested
-            </SubmitButton>
+          {c.opp.concerns && (
+            <div className="flex items-start gap-3 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-900 ring-1 ring-inset ring-amber-200/70">
+              <TriangleAlert className="mt-0.5 size-4 shrink-0 text-amber-600" />
+              {c.opp.concerns}
+            </div>
           )}
-        </form>
-        <form action={setStatusAction} className="ml-auto flex gap-1 text-stone-500">
-          <input type="hidden" name="id" value={c.opp.id} />
-          <input type="hidden" name="eval_date" value={evalDate} />
-          <SubmitButton name="status" value="deferred" className="!px-2 text-xs hover:bg-stone-100">
-            Defer 7d
-          </SubmitButton>
-          <SubmitButton name="status" value="dismissed" className="!px-2 text-xs hover:bg-stone-100">
-            Not relevant
-          </SubmitButton>
-          <SubmitButton name="status" value="completed" className="!px-2 text-xs hover:bg-stone-100">
-            Already handled
-          </SubmitButton>
-        </form>
-        <form action={redraftAction}>
-          <input type="hidden" name="id" value={c.opp.id} />
-          <SubmitButton className="!px-2 text-xs text-stone-500 hover:bg-stone-100">Redraft</SubmitButton>
-        </form>
-      </div>
 
-      <details className="mt-3 text-sm">
-        <summary className="cursor-pointer text-xs text-stone-500">Evidence &amp; score</summary>
-        <div className="mt-3 space-y-3">
-          <Evidence label={`${r}, ${c.need.note_date}`} text={c.need.supporting_text} verified={c.need.quote_verified} />
-          {c.offer && (
-            <Evidence label={`${p}, ${c.offer.note_date}`} text={c.offer.supporting_text} verified={c.offer.quote_verified} />
-          )}
-          {c.opp.missing_evidence && <p className="text-xs text-stone-500">Unknown: {c.opp.missing_evidence}</p>}
-          <ScoreBars c={c} />
+          {/* Next action */}
+          <div className="rounded-2xl border border-slate-100 bg-slate-50/60 p-4 sm:p-5">
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wider text-ink-600">Next step</p>
+                <p className="font-semibold text-slate-900">{step.label}</p>
+              </div>
+              <Stepper current={step.n} labels={[`Ask ${r}`, `Check ${p}`, "Introduce"]} />
+            </div>
+            <Suspense fallback={<DraftSkeleton />}>
+              <Draft c={c} label={kind === "intro" ? `To ${r} & ${p}` : `To ${kind === "ask_recipient" ? r : p}`} />
+            </Suspense>
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+              <form action={advanceAction} className="flex gap-2">
+                <input type="hidden" name="id" value={c.opp.id} />
+                <SubmitButton name="step" value={step.yes} pendingText="Saving…" className={btn.primary}>
+                  {kind === "intro" ? <Send className="size-4" /> : <Check className="size-4" />}
+                  {step.yesLabel}
+                </SubmitButton>
+                {kind !== "intro" && (
+                  <SubmitButton name="step" value="declined" pendingText="Saving…" className={btn.secondary}>
+                    Not interested
+                  </SubmitButton>
+                )}
+              </form>
+              <form action={redraftAction}>
+                <input type="hidden" name="id" value={c.opp.id} />
+                <SubmitButton pendingText="Redrafting…" className={btn.ghost}>
+                  <RefreshCw className="size-3.5" /> Redraft
+                </SubmitButton>
+              </form>
+              <form action={setStatusAction} className="ml-auto flex gap-0.5">
+                <input type="hidden" name="id" value={c.opp.id} />
+                <input type="hidden" name="eval_date" value={evalDate} />
+                <SubmitButton name="status" value="deferred" pendingText="…" className={`!px-2.5 text-xs ${btn.ghost}`}>
+                  Not now (7d)
+                </SubmitButton>
+                <SubmitButton name="status" value="dismissed" pendingText="…" className={`!px-2.5 text-xs ${btn.ghost}`}>
+                  Not relevant
+                </SubmitButton>
+                <SubmitButton name="status" value="completed" pendingText="…" className={`!px-2.5 text-xs ${btn.ghost}`}>
+                  Already handled
+                </SubmitButton>
+              </form>
+            </div>
+          </div>
+
+          <details className="group/ev">
+            <summary className="inline-flex cursor-pointer items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-slate-800">
+              <ChevronDown className="size-4 transition group-open/ev:rotate-180" /> Evidence &amp; score breakdown
+            </summary>
+            <div className="mt-4 grid gap-6 md:grid-cols-2">
+              <div className="space-y-3">
+                <Evidence label={`${r}, ${c.need.note_date}`} text={c.need.supporting_text} verified={c.need.quote_verified} />
+                {c.offer && (
+                  <Evidence label={`${p}, ${c.offer.note_date}`} text={c.offer.supporting_text} verified={c.offer.quote_verified} />
+                )}
+                {c.opp.missing_evidence && (
+                  <p className="text-xs text-slate-500">
+                    <span className="font-medium">Unknown:</span> {c.opp.missing_evidence}
+                  </p>
+                )}
+              </div>
+              <ScoreBreakdown c={c} />
+            </div>
+          </details>
         </div>
       </details>
     </li>
   );
 }
 
+function ScorePill({ score }: { score: number }) {
+  return (
+    <span className="hidden shrink-0 items-center gap-1.5 rounded-full bg-ink-50 px-3.5 py-1.5 text-sm font-semibold text-ink-900 sm:inline-flex">
+      <TrendingUp className="size-4 text-ink-600" />
+      {Math.round(score)}
+      <span className="font-medium text-ink-900/50">/ 100</span>
+    </span>
+  );
+}
+
+function Person({ name, role, children }: { name: string; role: (string | null)[]; children: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-4">
+      <Avatar name={name} size="lg" />
+      <div className="min-w-0 space-y-1.5">
+        <div>
+          <div className="font-bold text-slate-950">{name}</div>
+          <div className="truncate text-sm text-slate-500">{role.filter(Boolean).join(", ")}</div>
+        </div>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function Reason({
+  icon,
+  title,
+  children,
+  className = "",
+}: {
+  icon: React.ReactNode;
+  title: string;
+  children: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <div className={`flex gap-3 ${className}`}>
+      <span className="mt-0.5 text-ink-500">{icon}</span>
+      <div>
+        <h3 className="font-semibold text-slate-900">{title}</h3>
+        <p className="mt-1 text-sm leading-relaxed text-slate-600">{children}</p>
+      </div>
+    </div>
+  );
+}
+
+function Stepper({ current, labels }: { current: number; labels: string[] }) {
+  return (
+    <ol className="flex items-center gap-1.5 text-xs font-medium">
+      {labels.map((label, i) => {
+        const n = i + 1;
+        const done = n < current;
+        const active = n === current;
+        return (
+          <li key={label} className="flex items-center gap-1.5">
+            {i > 0 && <span className={`h-px w-4 ${done || active ? "bg-ink-300" : "bg-slate-200"}`} />}
+            <span
+              className={`flex items-center gap-1.5 rounded-full px-2 py-1 ${
+                active ? "bg-ink-900 text-white" : done ? "bg-ink-50 text-ink-700" : "text-slate-400"
+              }`}
+            >
+              <span
+                className={`flex size-4 items-center justify-center rounded-full text-[10px] ${
+                  active ? "bg-white/20" : done ? "bg-ink-600 text-white" : "ring-1 ring-slate-300"
+                }`}
+              >
+                {done ? <Check className="size-2.5" strokeWidth={3} /> : n}
+              </span>
+              <span className="max-w-24 truncate">{label}</span>
+            </span>
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
+
+function DraftSkeleton() {
+  return (
+    <div className="space-y-2.5 rounded-xl border border-slate-200 bg-white p-4">
+      <div className="flex items-center gap-2 text-xs font-medium text-ink-600">
+        <Sparkles className="size-3.5 animate-pulse" /> Claude is drafting your message…
+      </div>
+      {[92, 100, 85, 60].map((w) => (
+        <div key={w} className="h-2.5 animate-pulse rounded-full bg-slate-100" style={{ width: `${w}%` }} />
+      ))}
+    </div>
+  );
+}
+
 async function Draft({ c, label }: { c: Candidate; label: string }) {
-  const result = await getOrCreateDraft(c).then(
+  const result = await getOrCreateDraft(await requireCtx(), c).then(
     (draft) => ({ draft, error: null }),
     (e: Error) => ({ draft: null, error: e.message }),
   );
   if (result.draft == null) {
-    return <p className="text-sm text-red-700">Couldn&apos;t draft a message: {result.error}</p>;
+    return (
+      <p className="rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">Couldn&apos;t draft a message: {result.error}</p>
+    );
   }
   return <DraftBox key={result.draft} draft={result.draft} label={label} />;
 }
 
-function Badge({ children }: { children: React.ReactNode }) {
-  return <span className="ml-2 rounded bg-amber-100 px-1.5 py-0.5 text-xs text-amber-800">{children}</span>;
-}
-
 function Evidence({ label, text, verified }: { label: string; text: string; verified: boolean }) {
   return (
-    <blockquote className="border-l-2 border-amber-300 pl-3">
-      <div className="text-stone-800">&ldquo;{text}&rdquo;</div>
-      <div className="text-xs text-stone-500">
-        {label} · {verified ? "quote found in note" : "⚠ paraphrase, not found verbatim in note"}
-      </div>
-    </blockquote>
+    <figure className="rounded-xl border-l-[3px] border-ink-200 bg-slate-50 px-4 py-3">
+      <blockquote className="text-sm leading-relaxed text-slate-700">&ldquo;{text}&rdquo;</blockquote>
+      <figcaption className="mt-2 flex flex-wrap items-center gap-2 text-xs text-slate-500">
+        {label}
+        {verified ? (
+          <Chip tone="emerald">
+            <BadgeCheck className="size-3" /> verbatim in note
+          </Chip>
+        ) : (
+          <Chip tone="amber">
+            <TriangleAlert className="size-3" /> paraphrase
+          </Chip>
+        )}
+      </figcaption>
+    </figure>
   );
 }
 
-function ScoreBars({ c }: { c: Candidate }) {
+const FACTOR_COLORS = ["bg-ink-600", "bg-violet-400", "bg-sky-400", "bg-indigo-300", "bg-slate-300"];
+
+function ScoreBreakdown({ c }: { c: Candidate }) {
   const rows = [
     ["Give value", c.score.give, WEIGHTS.give, `${c.opp.give_value}/5`],
     ["Connection cooling", c.score.cooling, WEIGHTS.cooling, c.score.daysSinceInteraction != null ? `${c.score.daysSinceInteraction}d since contact` : "unknown"],
@@ -252,27 +471,50 @@ function ScoreBars({ c }: { c: Candidate }) {
     ["Match confidence", c.score.confidence, WEIGHTS.confidence, c.opp.match_basis.replace("_", " ")],
   ] as const;
   return (
-    <table className="w-full text-xs">
-      <tbody>
-        {rows.map(([label, value, weight, note]) => (
-          <tr key={label}>
-            <td className="w-40 py-0.5 text-stone-600">{label}</td>
-            <td className="py-0.5">
-              <div className="h-2 w-full rounded bg-stone-100">
-                <div className="h-2 rounded bg-amber-500" style={{ width: `${value * 100}%` }} />
-              </div>
-            </td>
-            <td className="w-16 py-0.5 text-right font-mono">+{(value * weight * 100).toFixed(1)}</td>
-            <td className="w-44 py-0.5 pl-3 text-stone-500">{note}</td>
-          </tr>
+    <div>
+      <div className="flex items-baseline justify-between">
+        <span className="text-sm font-semibold text-slate-800">Priority score</span>
+        <span className="text-sm font-semibold text-slate-900">
+          {c.score.total} <span className="font-normal text-slate-400">/ 100</span>
+        </span>
+      </div>
+      <div className="mt-2 flex h-2.5 overflow-hidden rounded-full bg-slate-100">
+        {rows.map(([label, value, weight], i) => (
+          <div key={label} className={`${FACTOR_COLORS[i]} border-r border-white last:border-0`} style={{ width: `${value * weight * 100}%` }} />
         ))}
-        <tr>
-          <td className="pt-1 font-medium">Priority</td>
-          <td />
-          <td className="pt-1 text-right font-mono font-semibold">{c.score.total}</td>
-          <td className="pl-3 pt-1 text-stone-500">of 100</td>
-        </tr>
-      </tbody>
-    </table>
+      </div>
+      <ul className="mt-3 space-y-1.5 text-xs">
+        {rows.map(([label, value, weight, note], i) => (
+          <li key={label} className="flex items-center gap-2">
+            <span className={`size-2 shrink-0 rounded-full ${FACTOR_COLORS[i]}`} />
+            <span className="w-36 text-slate-700">{label}</span>
+            <span className="flex-1 truncate text-slate-400">{note}</span>
+            <span className="font-mono text-slate-600">+{(value * weight * 100).toFixed(1)}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function Welcome() {
+  return (
+    <div className="mx-auto mt-10 max-w-xl">
+      <div className={`${card} flex flex-col items-center px-8 py-14 text-center`}>
+        <Logo size={44} />
+        <h1 className="mt-6 text-3xl font-bold tracking-tight text-slate-950">Your network is empty</h1>
+        <p className="mt-3 leading-relaxed text-slate-500">
+          Add people with <span className="font-medium text-slate-700">Add contact</span> or import a CSV on the Contacts
+          page, then log what you learn in conversations. Or explore WarmSignal with a ready-made demo network: 30
+          fictional contacts with notes, plus 5 public figures enriched from the web.
+        </p>
+        <form action={loadDemoAction} className="mt-8">
+          <SubmitButton pendingText="Loading…" className={`${btn.primary} !px-5 !py-2.5`}>
+            <Sparkles className="size-4" /> Load demo contacts
+          </SubmitButton>
+        </form>
+        <p className="mt-4 text-xs text-slate-400">You can remove the demo contacts later from the Contacts page.</p>
+      </div>
+    </div>
   );
 }

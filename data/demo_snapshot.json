@@ -1,0 +1,2126 @@
+{
+ "note": "Processed demo dataset (fictional contacts + public figures). Regenerate with: npm run demo:export -- --email <account>",
+ "contacts": [
+  {
+   "external_id": "c001",
+   "name": "Sarah Chen",
+   "company": "MedLoop AI",
+   "title": "CEO & Co-founder",
+   "industry": "Healthcare AI",
+   "relationship_strength": 4,
+   "last_interaction_date": "2026-08-20",
+   "introduction_preferences": null,
+   "enrichment": {
+    "status": "no_confident_match",
+    "identity_notes": "No result links a Sarah Chen to MedLoop AI; results cover namesakes (TechFlow, VC investor, Publicis Health) and unrelated Medloop/iMedLoop entities."
+   },
+   "enriched_at": "2026-10-25T19:44:40.594+00:00"
+  },
+  {
+   "external_id": "c002",
+   "name": "Michael Reed",
+   "company": "Northbeam Ventures",
+   "title": "General Partner",
+   "industry": "Venture Capital",
+   "relationship_strength": 4,
+   "last_interaction_date": "2026-07-30",
+   "introduction_preferences": "Happy to meet founders Alonso vouches for",
+   "enrichment": {
+    "status": "no_confident_match",
+    "identity_notes": "No result links any Michael Reed to Northbeam Ventures; Northbeam results concern an unrelated e-commerce analytics company."
+   },
+   "enriched_at": "2026-10-25T19:44:40.379+00:00"
+  },
+  {
+   "external_id": "c003",
+   "name": "Priya Natarajan",
+   "company": "Independent",
+   "title": "Advisor (former VP Enterprise Sales at HealthGrid)",
+   "industry": "Healthcare SaaS",
+   "relationship_strength": 3,
+   "last_interaction_date": "2026-09-02",
+   "introduction_preferences": null,
+   "enrichment": {
+    "status": "no_confident_match",
+    "identity_notes": "No result mentions HealthGrid or a VP Enterprise Sales; results cover namesakes (astrophysicist, HR leader, dentist, Lenovo/HomeKasa exec)."
+   },
+   "enriched_at": "2026-10-25T19:44:39.215+00:00"
+  },
+  {
+   "external_id": "c004",
+   "name": "David Okafor",
+   "company": "Ledgerline",
+   "title": "CEO",
+   "industry": "Fintech",
+   "relationship_strength": 4,
+   "last_interaction_date": "2026-08-05",
+   "introduction_preferences": null,
+   "enrichment": {
+    "status": "no_confident_match",
+    "identity_notes": "Results mention a Daniel (not David) Okafor at a SaaS Ledgerline and several unrelated Ledgerlines; nothing matches David Okafor at a fintech."
+   },
+   "enriched_at": "2026-10-25T19:44:40.217+00:00"
+  },
+  {
+   "external_id": "c005",
+   "name": "Elena Rossi",
+   "company": "Paystream",
+   "title": "Director of Engineering",
+   "industry": "Fintech",
+   "relationship_strength": 3,
+   "last_interaction_date": "2026-09-10",
+   "introduction_preferences": "Keep her job search confidential - do not mention to her current employer",
+   "enrichment": {
+    "status": "no_confident_match",
+    "identity_notes": "No result links an Elena Rossi to a Director of Engineering role at Paystream; results are namesakes or unrelated Paystream-named companies."
+   },
+   "enriched_at": "2026-10-25T19:44:39.98+00:00"
+  },
+  {
+   "external_id": "c006",
+   "name": "Tom Becker",
+   "company": "Routewise",
+   "title": "CEO",
+   "industry": "Logistics SaaS",
+   "relationship_strength": 5,
+   "last_interaction_date": "2026-07-15",
+   "introduction_preferences": "No investor intros right now - focused on customers",
+   "enrichment": {
+    "status": "no_confident_match",
+    "identity_notes": "No result links a Tom Becker to Routewise; the results describe namesakes at NorthStar Automation, Opus, Iofina, and Reality Labs, plus an unrelated Route Wise Consulting."
+   },
+   "enriched_at": "2026-10-25T19:44:47.409+00:00"
+  },
+  {
+   "external_id": "c007",
+   "name": "Grace Liu",
+   "company": "Brightmart Stores",
+   "title": "VP Operations",
+   "industry": "Retail",
+   "relationship_strength": 3,
+   "last_interaction_date": "2026-08-28",
+   "introduction_preferences": null,
+   "enrichment": {
+    "status": "no_confident_match",
+    "identity_notes": "No result links any Grace Liu to Brightmart Stores or a VP Operations role; all are namesakes or unrelated Brightmart entities."
+   },
+   "enriched_at": "2026-10-25T19:44:48.508+00:00"
+  },
+  {
+   "external_id": "c008",
+   "name": "Marcus Johnson",
+   "company": "Fernstack",
+   "title": "CEO",
+   "industry": "Developer Tools",
+   "relationship_strength": 2,
+   "last_interaction_date": "2026-09-18",
+   "introduction_preferences": null,
+   "enrichment": {
+    "status": "no_confident_match",
+    "identity_notes": "Results cover other Marcus Johnsons (financial advisor, IT director, Everest.com chief of staff); none mention Fernstack."
+   },
+   "enriched_at": "2026-10-25T19:44:47.062+00:00"
+  },
+  {
+   "external_id": "c009",
+   "name": "James Park",
+   "company": "Coinvault",
+   "title": "Founder",
+   "industry": "Crypto",
+   "relationship_strength": 2,
+   "last_interaction_date": "2026-09-25",
+   "introduction_preferences": null,
+   "enrichment": {
+    "status": "no_confident_match",
+    "identity_notes": "Results cover namesakes (Fitbit, GeoPark co-founders) and generic crypto news; nothing links a James Park to Coinvault."
+   },
+   "enriched_at": "2026-10-25T19:44:46.426+00:00"
+  },
+  {
+   "external_id": "c010",
+   "name": "Hannah Kim",
+   "company": "Sequel Capital",
+   "title": "Partner",
+   "industry": "Venture Capital",
+   "relationship_strength": 3,
+   "last_interaction_date": "2026-06-12",
+   "introduction_preferences": "Only Series A and later - please no pre-seed or seed intros",
+   "enrichment": {
+    "status": "no_confident_match",
+    "identity_notes": "No result links a Hannah Kim to Sequel Capital; the Hannah Kim matches are at Bessemer, Cerity, and Kennedy Wilson, and the Sequel mentions are unrelated companies."
+   },
+   "enriched_at": "2026-10-25T19:44:45.906+00:00"
+  },
+  {
+   "external_id": "c011",
+   "name": "Olivia Martinez",
+   "company": "Bloom & Co",
+   "title": "CMO",
+   "industry": "Consumer Goods",
+   "relationship_strength": 4,
+   "last_interaction_date": "2026-08-12",
+   "introduction_preferences": null,
+   "enrichment": {
+    "status": "no_confident_match",
+    "identity_notes": "No result links any Olivia Martinez to Bloom & Co; profiles show namesakes at other firms, and Bloom results concern Bloom Nutrition/Bloom Energy."
+   },
+   "enriched_at": "2026-10-25T19:44:53.178+00:00"
+  },
+  {
+   "external_id": "c012",
+   "name": "Ben Carter",
+   "company": "Signal Studio",
+   "title": "Founder",
+   "industry": "B2B Podcast Agency",
+   "relationship_strength": 3,
+   "last_interaction_date": "2026-07-22",
+   "introduction_preferences": null,
+   "enrichment": {
+    "status": "no_confident_match",
+    "identity_notes": "No result links a Ben Carter to Signal Studio; results cover namesakes (potter, photographer, investor, actor, musician) and unrelated agencies."
+   },
+   "enriched_at": "2026-10-25T19:44:54.889+00:00"
+  },
+  {
+   "external_id": "c013",
+   "name": "Kevin Wright",
+   "company": "Tallgrass Robotics",
+   "title": "COO",
+   "industry": "Robotics",
+   "relationship_strength": 2,
+   "last_interaction_date": "2025-12-03",
+   "introduction_preferences": null,
+   "enrichment": {
+    "status": "no_confident_match",
+    "identity_notes": "No result links any Kevin Wright to Tallgrass Robotics or a COO role; all are namesakes or unrelated robotics content."
+   },
+   "enriched_at": "2026-10-25T19:44:53.191+00:00"
+  },
+  {
+   "external_id": "c014",
+   "name": "Aisha Bello",
+   "company": "Kinfolk Health",
+   "title": "Head of Partnerships",
+   "industry": "Digital Health",
+   "relationship_strength": 3,
+   "last_interaction_date": "2026-05-20",
+   "introduction_preferences": null,
+   "enrichment": {
+    "status": "no_confident_match",
+    "identity_notes": "No result links any Aisha Bello to Kinfolk Health or a partnerships role in digital health; all are namesakes or unrelated."
+   },
+   "enriched_at": "2026-10-25T19:44:53.393+00:00"
+  },
+  {
+   "external_id": "c015",
+   "name": "Ryan O'Neil",
+   "company": "Clearpath Legal",
+   "title": "Partner",
+   "industry": "Legal Services",
+   "relationship_strength": 3,
+   "last_interaction_date": "2026-04-11",
+   "introduction_preferences": null,
+   "enrichment": {
+    "status": "no_confident_match",
+    "identity_notes": "No result links any Ryan O'Neil to Clearpath Legal; the matches are namesakes at other firms (Troutman, Campbell Conroy, Stevens & Lee)."
+   },
+   "enriched_at": "2026-10-25T19:44:52.977+00:00"
+  },
+  {
+   "external_id": "c016",
+   "name": "Sofia Alvarez",
+   "company": "Vantage Growth",
+   "title": "Founder",
+   "industry": "Marketing Agency",
+   "relationship_strength": 4,
+   "last_interaction_date": "2026-09-28",
+   "introduction_preferences": null,
+   "enrichment": {
+    "status": "no_confident_match",
+    "identity_notes": "No result links a Sofia Alvarez to a marketing agency called Vantage Growth; results cover unrelated namesakes and different Vantage companies."
+   },
+   "enriched_at": "2026-10-25T19:44:58.594+00:00"
+  },
+  {
+   "external_id": "c017",
+   "name": "Daniel Wu",
+   "company": "Nimbus Data",
+   "title": "CTO",
+   "industry": "Data Infrastructure",
+   "relationship_strength": 3,
+   "last_interaction_date": "2026-08-01",
+   "introduction_preferences": null,
+   "enrichment": {
+    "status": "no_confident_match",
+    "identity_notes": "No result links any Daniel Wu to Nimbus Data; the Daniel Wu profiles are namesakes at other companies, and other Nimbus results are unrelated firms."
+   },
+   "enriched_at": "2026-10-25T19:45:01.074+00:00"
+  },
+  {
+   "external_id": "c018",
+   "name": "Laura Schmidt",
+   "company": "Helix Bio",
+   "title": "VP Clinical Operations",
+   "industry": "Biotech",
+   "relationship_strength": 2,
+   "last_interaction_date": "2026-03-15",
+   "introduction_preferences": null,
+   "enrichment": {
+    "status": "no_confident_match",
+    "identity_notes": "No result links a Laura Schmidt to Helix Bio or clinical operations; Helix results concern unrelated companies."
+   },
+   "enriched_at": "2026-10-25T19:44:58.299+00:00"
+  },
+  {
+   "external_id": "c019",
+   "name": "Chris Taylor",
+   "company": "Summit Talent",
+   "title": "Executive Recruiter",
+   "industry": "Recruiting",
+   "relationship_strength": 2,
+   "last_interaction_date": "2026-09-05",
+   "introduction_preferences": null,
+   "enrichment": {
+    "status": "no_confident_match",
+    "identity_notes": "No result links a Chris Taylor to Summit Talent; results cover namesakes (enterprise architect, HR coach, consultant) and unrelated Summit firms."
+   },
+   "enriched_at": "2026-10-25T19:45:01.815+00:00"
+  },
+  {
+   "external_id": "c020",
+   "name": "Natalie Brooks",
+   "company": "Evergreen Angels",
+   "title": "Angel Investor",
+   "industry": "Angel Investing",
+   "relationship_strength": 3,
+   "last_interaction_date": "2026-06-30",
+   "introduction_preferences": null,
+   "enrichment": {
+    "status": "no_confident_match",
+    "identity_notes": "No result links a Natalie Brooks to Evergreen Angels; the matches are a jewelry owner and a senior director, both namesakes."
+   },
+   "enriched_at": "2026-10-25T19:44:59.817+00:00"
+  },
+  {
+   "external_id": "c021",
+   "name": "Omar Haddad",
+   "company": "Packwise",
+   "title": "Founder & CEO",
+   "industry": "E-commerce Logistics",
+   "relationship_strength": 3,
+   "last_interaction_date": "2026-02-14",
+   "introduction_preferences": null,
+   "enrichment": {
+    "status": "no_confident_match",
+    "identity_notes": "No result links an Omar Haddad to Packwise; results cover unrelated namesakes and a German container-management company named Packwise."
+   },
+   "enriched_at": "2026-10-25T19:45:07.862+00:00"
+  },
+  {
+   "external_id": "c022",
+   "name": "Megan Foster",
+   "company": "Cobalt Cloud",
+   "title": "VP Marketing",
+   "industry": "Cloud Infrastructure",
+   "relationship_strength": 3,
+   "last_interaction_date": "2026-07-08",
+   "introduction_preferences": null,
+   "enrichment": {
+    "status": "no_confident_match",
+    "identity_notes": "No result links any Megan Foster to Cobalt Cloud; profiles are namesakes in unrelated roles and companies."
+   },
+   "enriched_at": "2026-10-25T19:45:08.561+00:00"
+  },
+  {
+   "external_id": "c023",
+   "name": "Jorge Ramirez",
+   "company": "Lumen Payments",
+   "title": "Head of Compliance",
+   "industry": "Fintech",
+   "relationship_strength": 2,
+   "last_interaction_date": "2026-05-02",
+   "introduction_preferences": null,
+   "enrichment": {
+    "status": "no_confident_match",
+    "identity_notes": "No result links any Jorge Ramirez to Lumen Payments; the Lumen results concern unrelated companies (Lumen Technologies, Lumen Sovereign, Stellar Lumens)."
+   },
+   "enriched_at": "2026-10-25T19:45:08.414+00:00"
+  },
+  {
+   "external_id": "c024",
+   "name": "Emily Zhang",
+   "company": "Ardent Design",
+   "title": "Founder",
+   "industry": "Brand Design Agency",
+   "relationship_strength": 4,
+   "last_interaction_date": "2026-09-14",
+   "introduction_preferences": null,
+   "enrichment": {
+    "status": "no_confident_match",
+    "identity_notes": "No result links any Emily Zhang to Ardent Design; results are namesakes and unrelated 'Ardent' items."
+   },
+   "enriched_at": "2026-10-25T19:45:05.77+00:00"
+  },
+  {
+   "external_id": "c025",
+   "name": "Patrick Nolan",
+   "company": "Harbor Bank",
+   "title": "SVP Commercial Banking",
+   "industry": "Banking",
+   "relationship_strength": 2,
+   "last_interaction_date": "2026-01-20",
+   "introduction_preferences": null,
+   "enrichment": {
+    "status": "no_confident_match",
+    "identity_notes": "No result links a Patrick Nolan to Harbor Bank; the Patrick Nolans found work at other firms."
+   },
+   "enriched_at": "2026-10-25T19:45:05.466+00:00"
+  },
+  {
+   "external_id": "c026",
+   "name": "Rachel Adams",
+   "company": "TalentForge",
+   "title": "Founder",
+   "industry": "Recruiting",
+   "relationship_strength": 1,
+   "last_interaction_date": "2026-09-20",
+   "introduction_preferences": null,
+   "enrichment": {
+    "status": "no_confident_match",
+    "identity_notes": "Rachel Adams results concern an AI governance researcher, and TalentForge results concern an Eightfold AI product; nothing links a Rachel Adams to a recruiting company called TalentForge."
+   },
+   "enriched_at": "2026-10-25T19:45:15.886+00:00"
+  },
+  {
+   "external_id": "c027",
+   "name": "Victor Lee",
+   "company": "Arcadia Health Partners",
+   "title": "Managing Director",
+   "industry": "Healthcare Private Equity",
+   "relationship_strength": 2,
+   "last_interaction_date": "2025-11-08",
+   "introduction_preferences": null,
+   "enrichment": {
+    "status": "no_confident_match",
+    "identity_notes": "Results cover namesakes (music, pathology, banking) and unrelated Arcadia companies; none link a Victor Lee to Arcadia Health Partners."
+   },
+   "enriched_at": "2026-10-25T19:45:14.36+00:00"
+  },
+  {
+   "external_id": "c028",
+   "name": "Isabel Novak",
+   "company": "Quill CX",
+   "title": "CEO",
+   "industry": "Customer Support SaaS",
+   "relationship_strength": 3,
+   "last_interaction_date": "2026-08-25",
+   "introduction_preferences": null,
+   "enrichment": {
+    "status": "no_confident_match",
+    "identity_notes": "No result mentions Quill CX; the only Isabel Novak found is a manager at B&R Industrial Automation, a different person."
+   },
+   "enriched_at": "2026-10-25T19:45:14.915+00:00"
+  },
+  {
+   "external_id": "c029",
+   "name": "Samuel Grant",
+   "company": "Ironclad Security",
+   "title": "CISO",
+   "industry": "Cybersecurity",
+   "relationship_strength": 3,
+   "last_interaction_date": "2026-06-18",
+   "introduction_preferences": null,
+   "enrichment": {
+    "status": "no_confident_match",
+    "identity_notes": "No result shows a Samuel Grant as CISO at Ironclad Security; the only Samuel Grant found is an engineer at SEL, and the 'Ironclad' hits are unrelated uses of the word or Ironclad the contract company."
+   },
+   "enriched_at": "2026-10-25T19:45:13.484+00:00"
+  },
+  {
+   "external_id": "c030",
+   "name": "Zoe Patel",
+   "company": "Sprout Kids",
+   "title": "Founder",
+   "industry": "Consumer Edtech",
+   "relationship_strength": 3,
+   "last_interaction_date": "2026-09-30",
+   "introduction_preferences": null,
+   "enrichment": {
+    "status": "no_confident_match",
+    "identity_notes": "No result mentions a Zoe Patel connected to Sprout Kids; matches are a psychotherapist, a Sims character, and unrelated Sprout-named companies."
+   },
+   "enriched_at": "2026-10-25T19:45:14.23+00:00"
+  },
+  {
+   "external_id": "p001",
+   "name": "Jensen Huang",
+   "company": "NVIDIA",
+   "title": "Founder & CEO",
+   "industry": "AI Computing",
+   "relationship_strength": 1,
+   "last_interaction_date": null,
+   "introduction_preferences": "Public figure added only to demo web enrichment. Alonso has no personal relationship - never propose introductions.",
+   "enrichment": {
+    "status": "matched",
+    "sources": [
+     {
+      "url": "https://en.wikipedia.org/wiki/Jensen_Huang",
+      "title": "Jensen Huang - Wikipedia"
+     },
+     {
+      "url": "http://nvidianews.nvidia.com/bios/jensen-huang",
+      "title": "Jensen Huang | NVIDIA Newsroom"
+     },
+     {
+      "url": "https://www.nvidia.com/en-eu/about-nvidia/governance/management-team/jensen-huang",
+      "title": "Jensen Huang | NVIDIA"
+     },
+     {
+      "url": "https://federalnewsnetwork.com/technology-main/2026/08/the-naval-postgraduate-school-has-a-new-high-performance-ai-computing-system-from-nvidia",
+      "title": "The Naval Postgraduate School has a new high performance AI computing system from NVIDIA - Federal News Network"
+     },
+     {
+      "url": "https://www.manufacturingdive.com/news/wistron-opens-advanced-manufacturing-plant-nvidia-ai-systems/826042",
+      "title": "Wistron opens manufacturing plant for Nvidia AI systems | Manufacturing Dive"
+     }
+    ],
+    "summary": "Jensen Huang co-founded NVIDIA in 1993 and serves as its president and CEO. NVIDIA is a leading AI computing company making GPUs and AI infrastructure.",
+    "identity_notes": "Results consistently describe Jensen Huang as founder and CEO of NVIDIA, matching the contact.",
+    "recent_signals": [
+     {
+      "date": "2026-08-10",
+      "kind": "partnership",
+      "text": "NVIDIA partners with Apollo, BlackRock, Blackstone, others to mobilize $500B+ for AI infrastructure",
+      "source_url": "https://www.apollo.com/insights-news/pressreleases/2026/08/nvidia-partners-with-apollo"
+     },
+     {
+      "date": "2026-10-21",
+      "kind": "launch",
+      "text": "Huang unveiled Vera Rubin DSK Pod modular data center at GTC Berlin",
+      "source_url": "https://abcnews.com/Technology/wireStory/nvidia-ceo-encourages-europes-lagging-ai-sector-offers-137443738"
+     },
+     {
+      "date": "2025-12-10",
+      "kind": "press",
+      "text": "Named among Time's 'Architects of AI' Person of the Year",
+      "source_url": "https://en.wikipedia.org/wiki/Jensen_Huang"
+     },
+     {
+      "date": "2025-11-06",
+      "kind": "press",
+      "text": "Awarded Queen Elizabeth Prize for Engineering with Bill Dally",
+      "source_url": "https://en.wikipedia.org/wiki/Jensen_Huang"
+     },
+     {
+      "date": "2026-07-24",
+      "kind": "other",
+      "text": "Wistron opened Fort Worth plant producing NVIDIA AI systems",
+      "source_url": "https://www.manufacturingdive.com/news/wistron-opens-advanced-manufacturing-plant-nvidia-ai-systems/826042"
+     },
+     {
+      "date": "2026-08-31",
+      "kind": "partnership",
+      "text": "NVIDIA donated AI supercomputer to Naval Postgraduate School",
+      "source_url": "https://federalnewsnetwork.com/technology-main/2026/08/the-naval-postgraduate-school-has-a-new-high-performance-ai-computing-system-from-nvidia"
+     }
+    ],
+    "possible_offers": [
+     {
+      "date": "2026-08-10",
+      "text": "AI compute infrastructure and financing platform access",
+      "source_url": "https://www.apollo.com/insights-news/pressreleases/2026/08/nvidia-partners-with-apollo"
+     },
+     {
+      "date": null,
+      "text": "Venture investment via NVentures",
+      "source_url": "https://www.nvidia.com/en-eu/about-nvidia/governance/management-team/jensen-huang"
+     },
+     {
+      "date": null,
+      "text": "Deep semiconductor and AI industry leadership expertise",
+      "source_url": "http://nvidianews.nvidia.com/bios/jensen-huang"
+     }
+    ],
+    "identity_confidence": "high"
+   },
+   "enriched_at": "2026-10-25T19:53:55.911+00:00"
+  },
+  {
+   "external_id": "p002",
+   "name": "Patrick Collison",
+   "company": "Stripe",
+   "title": "Co-founder & CEO",
+   "industry": "Fintech",
+   "relationship_strength": 1,
+   "last_interaction_date": null,
+   "introduction_preferences": "Public figure added only to demo web enrichment. Alonso has no personal relationship - never propose introductions.",
+   "enrichment": {
+    "status": "matched",
+    "sources": [
+     {
+      "url": "https://www.businessroundtable.org/about-us/members/patrick-collison",
+      "title": "Patrick Collison | Business Roundtable"
+     },
+     {
+      "url": "https://x.com/patrickc?lang=en",
+      "title": "Patrick Collison (@patrickc) / X"
+     },
+     {
+      "url": "https://www.linkedin.com/in/patrickcollison",
+      "title": "Patrick Collison - Stripe CEO"
+     },
+     {
+      "url": "https://www.cnbc.com/2026/02/24/paypal-stock-stripe-acquisition-report.html",
+      "title": "PayPal pops nearly 7% on report Stripe is weighing an acquisition"
+     },
+     {
+      "url": "https://thepaypers.com/fintech/news/stripe-launches-treasury-for-agents-to-automate-startup-finances",
+      "title": "Stripe launches Treasury for AI agents | The Paypers"
+     }
+    ],
+    "summary": "Patrick Collison is the Irish co-founder and CEO of Stripe, which builds payments and economic infrastructure for internet businesses. He also co-founded Arc Institute.",
+    "identity_notes": "All sources consistently describe Patrick Collison as co-founder and CEO of Stripe.",
+    "recent_signals": [
+     {
+      "date": "2026-02-24",
+      "kind": "funding",
+      "text": "Stripe valued at $159B after employee/shareholder secondary sale",
+      "source_url": "https://www.cnbc.com/2026/02/24/paypal-stock-stripe-acquisition-report.html"
+     },
+     {
+      "date": "2026-07-16",
+      "kind": "other",
+      "text": "Stripe and Advent reportedly made joint $53bn bid for PayPal",
+      "source_url": "https://fintechmagazine.com/news/could-stripes-us-53bn-paypal-bid-reshape-global-payments"
+     },
+     {
+      "date": "2026-09-07",
+      "kind": "other",
+      "text": "Stripe acquired Clerky to build legal/incorporation offering for startups",
+      "source_url": "https://www.fintechfutures.com/m-a/stripe-acquires-clerky"
+     },
+     {
+      "date": "2026-09-28",
+      "kind": "press",
+      "text": "Collison says AI agents gave Stripe engineers at least 6x speedups",
+      "source_url": "https://www.efinancialcareers.com/news/stripe-s-top-engineers-are-producing-10x-as-much-as-they-did-in-2024"
+     },
+     {
+      "date": "2026-10-21",
+      "kind": "partnership",
+      "text": "Stripe now presents Stratechery; Collison announced the partnership",
+      "source_url": "https://x.com/patrickc?lang=en"
+     },
+     {
+      "date": "2026-10-23",
+      "kind": "launch",
+      "text": "Stripe launched Treasury for agents to automate startup finances",
+      "source_url": "https://thepaypers.com/fintech/news/stripe-launches-treasury-for-agents-to-automate-startup-finances"
+     },
+     {
+      "date": null,
+      "kind": "partnership",
+      "text": "Stripe partnered with Lloyds Banking Group to reach new businesses",
+      "source_url": "https://www.linkedin.com/in/patrickcollison"
+     }
+    ],
+    "possible_offers": [
+     {
+      "date": null,
+      "text": "Expertise scaling global payments infrastructure company",
+      "source_url": "https://www.businessroundtable.org/about-us/members/patrick-collison"
+     },
+     {
+      "date": "2026-09-28",
+      "text": "Insight on AI agent adoption in engineering teams",
+      "source_url": "https://www.efinancialcareers.com/news/stripe-s-top-engineers-are-producing-10x-as-much-as-they-did-in-2024"
+     },
+     {
+      "date": null,
+      "text": "Access to Arc Institute research network as cofounder",
+      "source_url": "https://www.linkedin.com/in/patrickcollison"
+     }
+    ],
+    "identity_confidence": "high"
+   },
+   "enriched_at": "2026-10-25T19:53:55.849+00:00"
+  },
+  {
+   "external_id": "p003",
+   "name": "Reid Hoffman",
+   "company": "Greylock",
+   "title": "Partner",
+   "industry": "Venture Capital",
+   "relationship_strength": 1,
+   "last_interaction_date": null,
+   "introduction_preferences": "Public figure added only to demo web enrichment. Alonso has no personal relationship - never propose introductions.",
+   "enrichment": {
+    "status": "matched",
+    "sources": [
+     {
+      "url": "https://www.linkedin.com/in/reidhoffman",
+      "title": "Reid Hoffman - Co-Founder, LinkedIn, Manas AI & Inflection AI. Founding Team, PayPal. Author of Superagency. Podcaster of Possible and Masters of Scale."
+     },
+     {
+      "url": "https://en.wikipedia.org/wiki/Reid_Hoffman",
+      "title": "Reid Hoffman - Wikipedia"
+     },
+     {
+      "url": "https://greylock.com/team/reid-hoffman",
+      "title": "Reid Hoffman | Greylock"
+     },
+     {
+      "url": "https://greylock.com/blog/introducing-greylock-18",
+      "title": "Introducing Greylock 18"
+     }
+    ],
+    "summary": "Reid Hoffman is the co-founder of LinkedIn and a partner at Greylock, where he has been since 2009. He focuses on early-stage investments in network-effect businesses. Greylock is an early-stage VC firm that backed Airbnb, Facebook, and Palo Alto Networks.",
+    "identity_notes": "Multiple sources, including Greylock's own site, confirm Reid Hoffman as LinkedIn co-founder and Greylock partner.",
+    "recent_signals": [
+     {
+      "date": "2026-07-14",
+      "kind": "funding",
+      "text": "Greylock announced Greylock 18, a new $1.5B early-stage venture fund",
+      "source_url": "https://greylock.com/blog/introducing-greylock-18"
+     }
+    ],
+    "possible_offers": [
+     {
+      "date": null,
+      "text": "Expertise scaling network-effect businesses (\"blitzscaling\")",
+      "source_url": "https://greylock.com/team/reid-hoffman"
+     },
+     {
+      "date": null,
+      "text": "Board director at Microsoft, Aurora, Inflection, Nauto, Entrepreneur First",
+      "source_url": "https://greylock.com/team/reid-hoffman"
+     },
+     {
+      "date": null,
+      "text": "Author of six best-selling books; frequent public speaker",
+      "source_url": "https://greylock.com/team/reid-hoffman"
+     },
+     {
+      "date": null,
+      "text": "Hosts the Possible and Masters of Scale podcasts",
+      "source_url": "https://www.linkedin.com/in/reidhoffman"
+     },
+     {
+      "date": null,
+      "text": "AI company building experience: co-founded Inflection AI and Manas AI",
+      "source_url": "https://en.wikipedia.org/wiki/Reid_Hoffman"
+     }
+    ],
+    "identity_confidence": "high"
+   },
+   "enriched_at": "2026-10-25T19:53:53.234+00:00"
+  },
+  {
+   "external_id": "p004",
+   "name": "Lisa Su",
+   "company": "AMD",
+   "title": "Chair & CEO",
+   "industry": "Semiconductors",
+   "relationship_strength": 1,
+   "last_interaction_date": null,
+   "introduction_preferences": "Public figure added only to demo web enrichment. Alonso has no personal relationship - never propose introductions.",
+   "enrichment": {
+    "status": "matched",
+    "sources": [
+     {
+      "url": "https://www.semiconductors.org/dr-lisa-su-amd-chair-and-ceo-elected-chair-of-semiconductor-industry-association",
+      "title": "Dr. Lisa Su, AMD Chair and CEO, Elected Chair of Semiconductor Industry Association - Semiconductor Industry Association"
+     },
+     {
+      "url": "https://www.businessroundtable.org/members/dr.-lisa-su",
+      "title": "Dr. Lisa Su | Business Roundtable"
+     },
+     {
+      "url": "https://finance.yahoo.com/markets/article/amd-stock-soars-to-new-record-as-semiconductors-bounce-chart-of-the-day-161627271.html",
+      "title": "AMD stock soars to new record as semiconductors bounce: Chart of the Day"
+     },
+     {
+      "url": "https://www.tomshardware.com/tech-industry/leading-semiconductor-analyst-accuses-amd-of-treason-over-restricted-chips-availability-in-china-amd-blames-diversion-of-export-controlled-rfsoc-usd36-000-radar-silicon-allegedly-quoted-at-usd1-000-for-crowdfunding-project",
+      "title": "Leading semiconductor analyst says AMD should be investigated for 'treason' over availability of restricted chips in China, AMD blames diversion of export-controlled RFSoC — $36,000 radar silicon allegedly quoted at $1,000 for crowdfunding project | Tom's Hardware"
+     },
+     {
+      "url": "https://www.uri.edu/news/2026/08/uri-professors-startup-team-joined-semiconductor-giant-amd",
+      "title": "URI professors’ startup team joined semiconductor giant AMD – Rhody Today"
+     }
+    ],
+    "summary": "Dr. Lisa Su is Chair & CEO of AMD, a semiconductor company supplying CPUs, GPUs and AI accelerators. She has led AMD since 2014.",
+    "identity_notes": "LinkedIn, AMD, Wikipedia and SIA sources all match Lisa Su as AMD Chair & CEO.",
+    "recent_signals": [
+     {
+      "date": "2025-11-20",
+      "kind": "leadership_change",
+      "text": "Elected Chair of the Semiconductor Industry Association Board of Directors",
+      "source_url": "https://www.semiconductors.org/dr-lisa-su-amd-chair-and-ceo-elected-chair-of-semiconductor-industry-association"
+     },
+     {
+      "date": "2026-08-12",
+      "kind": "other",
+      "text": "FastFlowLM startup team from URI joined AMD",
+      "source_url": "https://www.uri.edu/news/2026/08/uri-professors-startup-team-joined-semiconductor-giant-amd"
+     },
+     {
+      "date": "2026-09-21",
+      "kind": "press",
+      "text": "AMD hit all-time high, reaching $1 trillion market cap intraday",
+      "source_url": "https://finance.yahoo.com/markets/article/amd-stock-soars-to-new-record-as-semiconductors-bounce-chart-of-the-day-161627271.html"
+     },
+     {
+      "date": "2026-09-24",
+      "kind": "press",
+      "text": "Analyst criticism over export-controlled AMD chips appearing in China; AMD cites diversion",
+      "source_url": "https://www.tomshardware.com/tech-industry/leading-semiconductor-analyst-accuses-amd-of-treason-over-restricted-chips-availability-in-china-amd-blames-diversion-of-export-controlled-rfsoc-usd36-000-radar-silicon-allegedly-quoted-at-usd1-000-for-crowdfunding-project"
+     }
+    ],
+    "possible_offers": [
+     {
+      "date": null,
+      "text": "30+ years semiconductor leadership across IBM, Freescale, AMD",
+      "source_url": "https://www.semiconductors.org/dr-lisa-su-amd-chair-and-ceo-elected-chair-of-semiconductor-industry-association"
+     },
+     {
+      "date": "2025-11-20",
+      "text": "Industry policy access as SIA Board Chair",
+      "source_url": "https://www.semiconductors.org/dr-lisa-su-amd-chair-and-ceo-elected-chair-of-semiconductor-industry-association"
+     },
+     {
+      "date": null,
+      "text": "Business Roundtable member",
+      "source_url": "https://www.businessroundtable.org/members/dr.-lisa-su"
+     }
+    ],
+    "identity_confidence": "high"
+   },
+   "enriched_at": "2026-10-25T19:53:54.923+00:00"
+  },
+  {
+   "external_id": "p005",
+   "name": "Marc Benioff",
+   "company": "Salesforce",
+   "title": "Chair & CEO",
+   "industry": "Enterprise Software",
+   "relationship_strength": 1,
+   "last_interaction_date": null,
+   "introduction_preferences": "Public figure added only to demo web enrichment. Alonso has no personal relationship - never propose introductions.",
+   "enrichment": {
+    "status": "matched",
+    "sources": [
+     {
+      "url": "https://www.salesforce.com/company/marc-benioff-bio",
+      "title": "Marc Benioff Bio | Salesforce"
+     },
+     {
+      "url": "https://www.salesforce.com/news/marc-benioff",
+      "title": "Marc Benioff, Chair, CEO & Co-Founder - Salesforce"
+     },
+     {
+      "url": "https://www.salesforce.com/blog/author/marc-benioff",
+      "title": "Marc Benioff, Author - Salesforce"
+     },
+     {
+      "url": "https://www.cio.com/article/4222189/salesforce-seeks-to-rewrite-enterprise-software-with-aiforce.html",
+      "title": "Salesforce seeks to rewrite enterprise software with AIforce | CIO"
+     },
+     {
+      "url": "https://www.salesforce.com/news/stories/aiforce-announcement",
+      "title": "Salesforce Unveils the Future of Enterprise Software: AIforce - Salesforce"
+     }
+    ],
+    "summary": "Marc Benioff is Chair, CEO and co-founder of Salesforce, the world's largest CRM software company, now heavily focused on enterprise AI. He also owns and co-chairs TIME.",
+    "identity_notes": "Results consistently describe Marc Benioff as Chair, CEO and co-founder of Salesforce.",
+    "recent_signals": [
+     {
+      "date": "2026-09-15",
+      "kind": "launch",
+      "text": "Salesforce unveiled AIforce, a live interface layer, at Dreamforce 2026.",
+      "source_url": "https://www.salesforce.com/news/stories/aiforce-announcement"
+     },
+     {
+      "date": "2026-09-15",
+      "kind": "partnership",
+      "text": "Salesforce and Nvidia unveiled Koa, a CRM domain-specific reasoning model.",
+      "source_url": "https://www.cio.com/article/4222189/salesforce-seeks-to-rewrite-enterprise-software-with-aiforce.html"
+     },
+     {
+      "date": "2026-08-26",
+      "kind": "partnership",
+      "text": "Salesforce partnered with Anthropic to deliver Claudeforce.",
+      "source_url": "https://www.cio.com/article/4222189/salesforce-seeks-to-rewrite-enterprise-software-with-aiforce.html"
+     },
+     {
+      "date": "2026-08-10",
+      "kind": "other",
+      "text": "Salesforce moving to acquire Fin (formerly Intercom) for about $3.6 billion.",
+      "source_url": "https://qz.com/what-is-salesforce"
+     },
+     {
+      "date": "2026-09-29",
+      "kind": "press",
+      "text": "Goldman says 'headless' AI monetization gradual; stock down ~14% in 2026.",
+      "source_url": "https://www.investors.com/news/technology/salesforce-headless-ai-software-strategy-monetization-goldman-sachs"
+     }
+    ],
+    "possible_offers": [
+     {
+      "date": null,
+      "text": "Founder of TIME Ventures, with over 200 investments",
+      "source_url": "https://www.salesforce.com/news/marc-benioff"
+     },
+     {
+      "date": null,
+      "text": "Owner and co-chair of TIME magazine",
+      "source_url": "https://www.salesforce.com/news/marc-benioff"
+     },
+     {
+      "date": null,
+      "text": "WEF Board of Trustees member; global leadership network access",
+      "source_url": "https://www.salesforce.com/blog/author/marc-benioff"
+     },
+     {
+      "date": null,
+      "text": "Expertise in cloud computing, CRM, and enterprise AI strategy",
+      "source_url": "https://www.salesforce.com/company/marc-benioff-bio"
+     }
+    ],
+    "identity_confidence": "high"
+   },
+   "enriched_at": "2026-10-25T19:53:55.527+00:00"
+  }
+ ],
+ "interactions": [
+  {
+   "key": "4a95d573-12f1-4a95-80ab-36447ccad06d",
+   "contact": "c001",
+   "date": "2026-08-20",
+   "raw_notes": "Coffee with Sarah. MedLoop is preparing to raise a $4M seed round in November and she explicitly asked if I know healthcare investors - she wants intros to funds that do digital health. They've signed 2 hospital pilots. Also looking for an experienced enterprise sales advisor who has sold into health systems, since none of the founders has done that. She offered to connect any founder I know with clinicians from her advisory network.",
+   "context": {
+    "summary": "Sarah Chen of MedLoop AI is preparing a $4M seed raise in November, wants intros to digital health investors and an enterprise health-system sales advisor, and offered clinician introductions from her advisory network.",
+    "uncertainties": [
+     "Exact close date of the November seed round is not specified; investor intros are most useful before then.",
+     "Status of the raise (lead investor, terms) is unknown; fundraising plans may be sensitive and not public.",
+     "The 2 hospital pilots are signed but the hospitals are not named and pilot outcomes are unknown.",
+     "Unclear whether the sales advisor role is paid, equity-based, or informal."
+    ]
+   },
+   "extracted_at": "2026-10-25T19:41:05.075+00:00"
+  },
+  {
+   "key": "f9957aa0-1985-454a-aa52-8e1175e6d0ca",
+   "contact": "c002",
+   "date": "2026-07-30",
+   "raw_notes": "Lunch with Michael. Northbeam just closed Fund III. He said he wants to see more early-stage digital health deals - seed and Series A, especially AI tools for hospitals. He's actively looking and asked me to send good founders his way. Also mentioned his portfolio companies always need help with go-to-market and brand.",
+   "context": {
+    "summary": "Michael Reed of Northbeam Ventures, which just closed Fund III, is actively seeking seed and Series A digital health deals, especially AI tools for hospitals, and asked for founder referrals.",
+    "uncertainties": [
+     "The go-to-market and brand help need belongs to Northbeam's portfolio companies, not Michael himself; it's unclear whether he would actively refer them.",
+     "Fund III size, check sizes, and geographic focus were not mentioned.",
+     "Unclear whether his interest extends beyond digital health or beyond hospital-focused AI tools.",
+     "No timeframe was given for how long he will be actively deploying from Fund III."
+    ]
+   },
+   "extracted_at": "2026-10-25T19:41:10.276+00:00"
+  },
+  {
+   "key": "8508d9e2-dc29-442f-b214-47723a7174aa",
+   "contact": "c003",
+   "date": "2026-09-02",
+   "raw_notes": "Caught up with Priya. She left HealthGrid in the spring after 9 years running enterprise sales into hospital systems. She told me she wants 2-3 advisory roles with early-stage healthcare startups, ideally with equity. Very open to meeting founders.",
+   "context": {
+    "summary": "Priya Natarajan, who left HealthGrid in the spring after 9 years leading enterprise sales into hospital systems, is seeking 2-3 equity-based advisory roles with early-stage healthcare startups and is open to meeting founders.",
+    "uncertainties": [
+     "Compensation preference is 'ideally with equity'; unclear whether she would accept cash-only or unpaid roles.",
+     "Specific healthcare subsectors, stages, or geographies she prefers are not stated.",
+     "Whether she would consider full-time roles or only advisory roles is not stated.",
+     "Her capacity limit of 2-3 roles suggests intros should be selective; current number of advisory roles held is unknown."
+    ]
+   },
+   "extracted_at": "2026-10-25T19:41:04.8+00:00"
+  },
+  {
+   "key": "79e1d04d-8cf0-4faf-a2ad-7b238d594f56",
+   "contact": "c004",
+   "date": "2026-08-05",
+   "raw_notes": "Zoom with David. Ledgerline is hiring a VP of Engineering - their last search fell through and he needs someone by Q1 who has scaled payments infrastructure. He also mentioned he knows a lot of people in the payments regulatory world and is happy to help founders navigate compliance.",
+   "context": {
+    "summary": "David Okafor, CEO of Ledgerline, is hiring a VP of Engineering with payments infrastructure scaling experience by Q1 and offered to help founders navigate payments compliance through his regulatory network.",
+    "uncertainties": [
+     "'By Q1' is assumed to mean Q1 2027 (ending 2027-03-31); the exact year/fiscal calendar was not stated.",
+     "Unclear why the previous VP Engineering search fell through; may be sensitive.",
+     "Not stated whether David is open to recruiter/search firm introductions or only candidate referrals.",
+     "Unclear whether David's offer to make introductions to his regulatory contacts extends beyond general compliance advice."
+    ]
+   },
+   "extracted_at": "2026-10-25T19:41:05.089+00:00"
+  },
+  {
+   "key": "91e69513-8a3d-435b-8a17-71cf3679efb5",
+   "contact": "c005",
+   "date": "2026-09-10",
+   "raw_notes": "Elena reached out privately. She's quietly exploring VP Engineering roles at fintech startups - wants to lead a team building payments infrastructure. Please keep it confidential. She's led the Paystream ledger rebuild for 3 years.",
+   "context": {
+    "summary": "Elena Rossi, Director of Engineering at Paystream, confidentially shared that she is quietly exploring VP Engineering roles at fintech startups building payments infrastructure.",
+    "uncertainties": [
+     "CONFIDENTIAL: Elena asked to keep her job search confidential ('Please keep it confidential'). Do not make intros that could reveal her search to Paystream or its network; only make discreet, opt-in intros to hiring founders/recruiters with her explicit consent.",
+     "No timeline, location, compensation, or startup stage preferences were specified.",
+     "Her offered expertise (ledger rebuild) is likely tied to her current employer; sharing it with others may require discretion given the confidential search."
+    ]
+   },
+   "extracted_at": "2026-10-25T19:41:04.313+00:00"
+  },
+  {
+   "key": "e19d22fe-19aa-4465-96df-242cbcfbba33",
+   "contact": "c006",
+   "date": "2026-07-15",
+   "raw_notes": "Dinner with Tom. Routewise is focused on landing mid-size retail customers for their delivery routing software - he'd love intros to operations leaders at retail chains. He was clear he does not want investor intros right now. He offered to share their pricing playbook with any SaaS founder.",
+   "context": {
+    "summary": "Over dinner, Tom Becker shared that Routewise is focused on landing mid-size retail customers for its delivery routing software and offered to share its pricing playbook with SaaS founders.",
+    "uncertainties": [
+     "Sensitivity: Tom explicitly does not want investor intros right now ('He was clear he does not want investor intros right now'). Do not suggest fundraising introductions.",
+     "It is unclear whether the target is strictly mid-size retail chains or retail chains of any size. The note mentions 'mid-size retail customers' but also 'operations leaders at retail chains' more generally.",
+     "No timeframe is given for when investor intros might become acceptable."
+    ]
+   },
+   "extracted_at": "2026-10-25T19:41:14.976+00:00"
+  },
+  {
+   "key": "abefad9b-f1d6-4779-be46-2a3a1d215b87",
+   "contact": "c008",
+   "date": "2026-09-18",
+   "raw_notes": "Chatted briefly with Marcus at a conference reception. He's a startup CEO. We didn't get into much detail - mostly talked about the conference talks.",
+   "context": {
+    "summary": "Brief conference reception chat with Marcus Johnson, CEO of Fernstack, mostly about the conference talks with no substantive business discussion.",
+    "uncertainties": [
+     "Conversation was brief and lacked detail; no needs or offers were stated, so none were extracted.",
+     "Being a startup CEO does not by itself indicate fundraising, hiring, or other needs; avoid assuming these without follow-up.",
+     "Fernstack's stage, size, and current priorities are unknown."
+    ]
+   },
+   "extracted_at": "2026-10-25T19:41:13.089+00:00"
+  },
+  {
+   "key": "0eed0adb-971a-4f34-906e-72e028e28316",
+   "contact": "c009",
+   "date": "2026-09-25",
+   "raw_notes": "Ran into James. He mentioned that a friend of his is looking for healthcare investors, but didn't say who. Coinvault itself is doing fine and he didn't ask for anything.",
+   "context": {
+    "summary": "Brief chance encounter with James Park, who said Coinvault is doing fine, asked for nothing, and mentioned an unnamed friend seeking healthcare investors.",
+    "uncertainties": [
+     "James mentioned that an unnamed friend is looking for healthcare investors; this is a third party's need, not James's, and the friend's identity is unknown.",
+     "It is unclear whether James wants to be involved in or facilitate an introduction for his friend.",
+     "James explicitly did not ask for anything; Coinvault is reportedly doing fine, so no needs should be assumed for him or the company."
+    ]
+   },
+   "extracted_at": "2026-10-25T19:41:14.129+00:00"
+  },
+  {
+   "key": "a2e3ec23-47c0-4561-824a-808f5cbcf584",
+   "contact": "c011",
+   "date": "2026-08-12",
+   "raw_notes": "Olivia wants to launch a founder-led podcast for Bloom & Co to build B2B wholesale relationships. She's looking for a production agency that understands B2B and wants to launch by January.",
+   "context": {
+    "summary": "Olivia Martinez, CMO at Bloom & Co, plans to launch a founder-led podcast to build B2B wholesale relationships and is seeking a B2B-savvy production agency to launch by January.",
+    "uncertainties": [
+     "'January' is assumed to mean January 2027; the exact launch date is not specified.",
+     "Budget, the podcast format, and whether the founder is committed to hosting are not stated.",
+     "The types of wholesale partners targeted, such as retailers or distributors, are unspecified."
+    ]
+   },
+   "extracted_at": "2026-10-25T19:41:14.765+00:00"
+  },
+  {
+   "key": "a9518a61-466f-47b1-92de-cf7fb8b5cbc2",
+   "contact": "c007",
+   "date": "2026-08-28",
+   "raw_notes": "Met Grace at the retail ops summit. Brightmart is evaluating delivery and routing software vendors this quarter - their current system is failing and she has budget approved for Q4. She asked if I know any good vendors.",
+   "context": {
+    "summary": "Grace Liu of Brightmart Stores, met at a retail ops summit, is evaluating delivery and routing software vendors this quarter with Q4 budget approved and asked for vendor recommendations.",
+    "uncertainties": [
+     "Unclear whether 'this quarter' means the evaluation concludes by end of Q3 (Sept 30) or extends into Q4; budget is approved for Q4.",
+     "Specific requirements (fleet size, integrations, store count, budget size) are not stated.",
+     "Not stated whether Grace is the final decision-maker or one of several stakeholders in the vendor selection."
+    ]
+   },
+   "extracted_at": "2026-10-25T19:41:16.091+00:00"
+  },
+  {
+   "key": "8d56682c-1f53-4bb6-b4ea-525aefe67525",
+   "contact": "c012",
+   "date": "2026-07-22",
+   "raw_notes": "Ben's agency Signal Studio produces B2B podcasts end-to-end - strategy, guest booking, editing. They have capacity for two new clients this fall and he asked me for referrals.",
+   "context": {
+    "summary": "Ben Carter of Signal Studio, a B2B podcast agency offering end-to-end production, has capacity for two new clients this fall and asked for referrals.",
+    "uncertainties": [
+     "Ideal client profile (industry, company size, budget) for referrals is not specified.",
+     "'This fall' window is approximate; capacity may fill before then.",
+     "Pricing and engagement terms not mentioned."
+    ]
+   },
+   "extracted_at": "2026-10-25T19:41:20.478+00:00"
+  },
+  {
+   "key": "4b8c9fe7-e655-4949-bc0c-1f60cc9ae6e6",
+   "contact": "c013",
+   "date": "2025-12-03",
+   "raw_notes": "Kevin said Tallgrass needs office space in Austin before their January move. Asked if I knew any commercial real estate brokers.",
+   "context": {
+    "summary": "Kevin Wright, COO of Tallgrass Robotics, said the company needs Austin office space before a January move and asked for commercial real estate broker referrals.",
+    "uncertainties": [
+     "Exact January move date not specified; urgency may be high.",
+     "Office size, budget, and lease requirements unknown.",
+     "Note does not say whether brokers must be Austin-based, though that is implied by the context."
+    ]
+   },
+   "extracted_at": "2026-10-25T19:41:20.717+00:00"
+  },
+  {
+   "key": "3f0457d7-d4b8-4654-b4a8-0fd8e889e03c",
+   "contact": "c010",
+   "date": "2026-06-12",
+   "raw_notes": "Hannah said Sequel is focused on Series A and B healthcare and fintech companies with at least $2M ARR. Reiterated she doesn't look at seed deals.",
+   "context": {
+    "summary": "Hannah Kim described Sequel Capital's investment focus on Series A and B healthcare and fintech companies with at least $2M ARR and reiterated that she does not look at seed deals.",
+    "uncertainties": [
+     "Hard filter: she doesn't look at seed deals, so do not introduce seed-stage companies.",
+     "Minimum threshold of $2M ARR; companies below this are unlikely to fit.",
+     "Check size, geography, and whether she is actively seeking new deals now were not stated.",
+     "It is unclear whether this focus is Sequel's firm-wide mandate or Hannah's personal focus."
+    ]
+   },
+   "extracted_at": "2026-10-25T19:41:23.148+00:00"
+  },
+  {
+   "key": "5b6784e3-9d24-4fc1-8034-5ffd5a520f13",
+   "contact": "c026",
+   "date": "2026-09-20",
+   "raw_notes": "Rachel runs a recruiting firm and asked me to introduce her to as many startup CEOs as possible so she can pitch her recruiting services.",
+   "context": {
+    "summary": "Rachel Adams, founder of recruiting firm TalentForge, asked to be introduced to as many startup CEOs as possible so she can pitch her recruiting services.",
+    "uncertainties": [
+     "Request is for volume intros ('as many startup CEOs as possible') to pitch services; CEOs may not welcome unsolicited sales intros, so confirm each CEO actually has a hiring need and opts in before introducing.",
+     "No detail on TalentForge's specialization (roles, stages, industries, geography), pricing model, or track record, which makes it hard to judge fit for specific CEOs.",
+     "Unclear whether Rachel expects a referral arrangement or anything in return for intros."
+    ]
+   },
+   "extracted_at": "2026-10-25T19:41:21.503+00:00"
+  }
+ ],
+ "signals": [
+  {
+   "key": "9427c80a-46de-46fc-80c7-43e8294ed2e8",
+   "contact": "c005",
+   "interaction": "91e69513-8a3d-435b-8a17-71cf3679efb5",
+   "type": "need",
+   "category": "job_search",
+   "description": "VP Engineering role at fintech startup",
+   "supporting_text": "She's quietly exploring VP Engineering roles at fintech startups",
+   "quote_verified": true,
+   "is_inferred": false,
+   "time_sensitive": true,
+   "confidence": 0.95,
+   "status": "active",
+   "relevant_until": null
+  },
+  {
+   "key": "c55522c3-642a-4283-a072-e8ed40af67f8",
+   "contact": "c005",
+   "interaction": "91e69513-8a3d-435b-8a17-71cf3679efb5",
+   "type": "need",
+   "category": "job_search",
+   "description": "Leading team building payments infrastructure",
+   "supporting_text": "wants to lead a team building payments infrastructure",
+   "quote_verified": true,
+   "is_inferred": false,
+   "time_sensitive": true,
+   "confidence": 0.9,
+   "status": "active",
+   "relevant_until": null
+  },
+  {
+   "key": "42235526-4a58-462d-b4f5-6db89a085d1f",
+   "contact": "c005",
+   "interaction": "91e69513-8a3d-435b-8a17-71cf3679efb5",
+   "type": "offer",
+   "category": "expertise",
+   "description": "Payments ledger rebuild engineering leadership experience",
+   "supporting_text": "She's led the Paystream ledger rebuild for 3 years.",
+   "quote_verified": true,
+   "is_inferred": false,
+   "time_sensitive": false,
+   "confidence": 0.85,
+   "status": "active",
+   "relevant_until": null
+  },
+  {
+   "key": "0cce02a2-29c6-4d43-bd79-8418a3a7a8de",
+   "contact": "c003",
+   "interaction": "8508d9e2-dc29-442f-b214-47723a7174aa",
+   "type": "need",
+   "category": "job_search",
+   "description": "2-3 advisory roles at early-stage healthcare startups",
+   "supporting_text": "She told me she wants 2-3 advisory roles with early-stage healthcare startups, ideally with equity.",
+   "quote_verified": true,
+   "is_inferred": false,
+   "time_sensitive": false,
+   "confidence": 0.95,
+   "status": "active",
+   "relevant_until": null
+  },
+  {
+   "key": "7fa4f9a3-1a83-47a4-ba1f-0d28994eead5",
+   "contact": "c003",
+   "interaction": "8508d9e2-dc29-442f-b214-47723a7174aa",
+   "type": "need",
+   "category": "partnerships",
+   "description": "Introductions to early-stage healthcare founders",
+   "supporting_text": "Very open to meeting founders.",
+   "quote_verified": true,
+   "is_inferred": false,
+   "time_sensitive": false,
+   "confidence": 0.85,
+   "status": "active",
+   "relevant_until": null
+  },
+  {
+   "key": "b6001d8d-6ca5-486a-b042-112e835924be",
+   "contact": "c003",
+   "interaction": "8508d9e2-dc29-442f-b214-47723a7174aa",
+   "type": "offer",
+   "category": "advisors",
+   "description": "Advisory support for early-stage healthcare startups",
+   "supporting_text": "She told me she wants 2-3 advisory roles with early-stage healthcare startups, ideally with equity.",
+   "quote_verified": true,
+   "is_inferred": false,
+   "time_sensitive": false,
+   "confidence": 0.9,
+   "status": "active",
+   "relevant_until": null
+  },
+  {
+   "key": "8ae15e52-ad03-41a8-ab73-7fb892533eba",
+   "contact": "c003",
+   "interaction": "8508d9e2-dc29-442f-b214-47723a7174aa",
+   "type": "offer",
+   "category": "expertise",
+   "description": "Enterprise sales into hospital systems",
+   "supporting_text": "She left HealthGrid in the spring after 9 years running enterprise sales into hospital systems.",
+   "quote_verified": true,
+   "is_inferred": false,
+   "time_sensitive": false,
+   "confidence": 0.9,
+   "status": "active",
+   "relevant_until": null
+  },
+  {
+   "key": "4c443053-b450-43fd-b461-874c0a9e04f3",
+   "contact": "c001",
+   "interaction": "4a95d573-12f1-4a95-80ab-36447ccad06d",
+   "type": "need",
+   "category": "fundraising",
+   "description": "Intros to digital health seed investors",
+   "supporting_text": "MedLoop is preparing to raise a $4M seed round in November and she explicitly asked if I know healthcare investors - she wants intros to funds that do digital health.",
+   "quote_verified": true,
+   "is_inferred": false,
+   "time_sensitive": true,
+   "confidence": 0.95,
+   "status": "active",
+   "relevant_until": "2026-11-30"
+  },
+  {
+   "key": "83154808-3717-48b1-b77a-f743796c435f",
+   "contact": "c001",
+   "interaction": "4a95d573-12f1-4a95-80ab-36447ccad06d",
+   "type": "need",
+   "category": "advisors",
+   "description": "Enterprise sales advisor experienced selling to health systems",
+   "supporting_text": "Also looking for an experienced enterprise sales advisor who has sold into health systems, since none of the founders has done that.",
+   "quote_verified": true,
+   "is_inferred": false,
+   "time_sensitive": false,
+   "confidence": 0.9,
+   "status": "active",
+   "relevant_until": null
+  },
+  {
+   "key": "0b5f8032-c6eb-4dc2-8d4d-fe7941a6a8c4",
+   "contact": "c001",
+   "interaction": "4a95d573-12f1-4a95-80ab-36447ccad06d",
+   "type": "offer",
+   "category": "expertise",
+   "description": "Intros to clinicians from her advisory network",
+   "supporting_text": "She offered to connect any founder I know with clinicians from her advisory network.",
+   "quote_verified": true,
+   "is_inferred": false,
+   "time_sensitive": false,
+   "confidence": 0.9,
+   "status": "active",
+   "relevant_until": null
+  },
+  {
+   "key": "06d0ed35-aa7b-42a7-abab-d021a09b693b",
+   "contact": "c004",
+   "interaction": "79e1d04d-8cf0-4faf-a2ad-7b238d594f56",
+   "type": "need",
+   "category": "hiring",
+   "description": "VP of Engineering experienced scaling payments infrastructure",
+   "supporting_text": "Ledgerline is hiring a VP of Engineering - their last search fell through and he needs someone by Q1 who has scaled payments infrastructure.",
+   "quote_verified": true,
+   "is_inferred": false,
+   "time_sensitive": true,
+   "confidence": 0.95,
+   "status": "active",
+   "relevant_until": "2027-03-31"
+  },
+  {
+   "key": "7a9d96c7-c758-4f8b-9cd4-7189fa66e752",
+   "contact": "c004",
+   "interaction": "79e1d04d-8cf0-4faf-a2ad-7b238d594f56",
+   "type": "offer",
+   "category": "expertise",
+   "description": "Helping founders navigate payments compliance",
+   "supporting_text": "is happy to help founders navigate compliance",
+   "quote_verified": true,
+   "is_inferred": false,
+   "time_sensitive": false,
+   "confidence": 0.9,
+   "status": "active",
+   "relevant_until": null
+  },
+  {
+   "key": "466b77fe-5509-41e4-bd7d-082e1b81036e",
+   "contact": "c004",
+   "interaction": "79e1d04d-8cf0-4faf-a2ad-7b238d594f56",
+   "type": "offer",
+   "category": "partnerships",
+   "description": "Connections in payments regulatory world",
+   "supporting_text": "he knows a lot of people in the payments regulatory world",
+   "quote_verified": true,
+   "is_inferred": false,
+   "time_sensitive": false,
+   "confidence": 0.85,
+   "status": "active",
+   "relevant_until": null
+  },
+  {
+   "key": "5c6a4ce1-96ef-456f-8e2f-1b861d550fb4",
+   "contact": "c002",
+   "interaction": "f9957aa0-1985-454a-aa52-8e1175e6d0ca",
+   "type": "need",
+   "category": "investing",
+   "description": "Seed/Series A digital health founder referrals",
+   "supporting_text": "He said he wants to see more early-stage digital health deals - seed and Series A",
+   "quote_verified": true,
+   "is_inferred": false,
+   "time_sensitive": true,
+   "confidence": 0.95,
+   "status": "active",
+   "relevant_until": null
+  },
+  {
+   "key": "ac23326e-5b28-47a7-8aaf-95011c0822a3",
+   "contact": "c002",
+   "interaction": "f9957aa0-1985-454a-aa52-8e1175e6d0ca",
+   "type": "need",
+   "category": "investing",
+   "description": "Early-stage AI tools for hospitals deal flow",
+   "supporting_text": "especially AI tools for hospitals. He's actively looking and asked me to send good founders his way.",
+   "quote_verified": true,
+   "is_inferred": false,
+   "time_sensitive": true,
+   "confidence": 0.95,
+   "status": "active",
+   "relevant_until": null
+  },
+  {
+   "key": "bd3a88fa-4fbc-4112-ac0b-90c84de463ce",
+   "contact": "c002",
+   "interaction": "f9957aa0-1985-454a-aa52-8e1175e6d0ca",
+   "type": "offer",
+   "category": "investing",
+   "description": "Seed and Series A capital from Fund III",
+   "supporting_text": "Northbeam just closed Fund III.",
+   "quote_verified": true,
+   "is_inferred": false,
+   "time_sensitive": true,
+   "confidence": 0.85,
+   "status": "active",
+   "relevant_until": null
+  },
+  {
+   "key": "6fd2155c-693f-48e2-840f-75f28e995fb8",
+   "contact": "c002",
+   "interaction": "f9957aa0-1985-454a-aa52-8e1175e6d0ca",
+   "type": "offer",
+   "category": "partnerships",
+   "description": "Possible referrals of portfolio companies needing GTM help",
+   "supporting_text": "Also mentioned his portfolio companies always need help with go-to-market and brand.",
+   "quote_verified": true,
+   "is_inferred": true,
+   "time_sensitive": false,
+   "confidence": 0.4,
+   "status": "active",
+   "relevant_until": null
+  },
+  {
+   "key": "91a77dff-186d-4e94-9403-f268b2716608",
+   "contact": "c011",
+   "interaction": "a2e3ec23-47c0-4561-824a-808f5cbcf584",
+   "type": "need",
+   "category": "vendors",
+   "description": "B2B-savvy podcast production agency",
+   "supporting_text": "She's looking for a production agency that understands B2B and wants to launch by January.",
+   "quote_verified": true,
+   "is_inferred": false,
+   "time_sensitive": true,
+   "confidence": 0.95,
+   "status": "active",
+   "relevant_until": "2027-01-31"
+  },
+  {
+   "key": "ac604152-c60f-4a49-b6c2-7e04a4c68805",
+   "contact": "c011",
+   "interaction": "a2e3ec23-47c0-4561-824a-808f5cbcf584",
+   "type": "need",
+   "category": "customers",
+   "description": "B2B wholesale relationships for Bloom & Co",
+   "supporting_text": "Olivia wants to launch a founder-led podcast for Bloom & Co to build B2B wholesale relationships.",
+   "quote_verified": true,
+   "is_inferred": false,
+   "time_sensitive": false,
+   "confidence": 0.85,
+   "status": "active",
+   "relevant_until": null
+  },
+  {
+   "key": "e8b721ba-391f-4a31-b44d-7b1cc4417d9f",
+   "contact": "c006",
+   "interaction": "e19d22fe-19aa-4465-96df-242cbcfbba33",
+   "type": "need",
+   "category": "customers",
+   "description": "Intros to operations leaders at mid-size retail chains",
+   "supporting_text": "he'd love intros to operations leaders at retail chains",
+   "quote_verified": true,
+   "is_inferred": false,
+   "time_sensitive": false,
+   "confidence": 0.95,
+   "status": "active",
+   "relevant_until": null
+  },
+  {
+   "key": "979ae026-1a1f-4279-8ab3-bc5c01fd09d4",
+   "contact": "c006",
+   "interaction": "e19d22fe-19aa-4465-96df-242cbcfbba33",
+   "type": "offer",
+   "category": "expertise",
+   "description": "Shares Routewise pricing playbook with SaaS founders",
+   "supporting_text": "He offered to share their pricing playbook with any SaaS founder.",
+   "quote_verified": true,
+   "is_inferred": false,
+   "time_sensitive": false,
+   "confidence": 0.95,
+   "status": "active",
+   "relevant_until": null
+  },
+  {
+   "key": "df621c08-011c-4bad-be7e-04be4e0e4a07",
+   "contact": "c007",
+   "interaction": "a9518a61-466f-47b1-92de-cf7fb8b5cbc2",
+   "type": "need",
+   "category": "vendors",
+   "description": "Delivery and routing software vendors for retail",
+   "supporting_text": "Brightmart is evaluating delivery and routing software vendors this quarter - their current system is failing and she has budget approved for Q4. She asked if I know any good vendors.",
+   "quote_verified": true,
+   "is_inferred": false,
+   "time_sensitive": true,
+   "confidence": 0.95,
+   "status": "active",
+   "relevant_until": "2026-12-31"
+  },
+  {
+   "key": "9855b85f-6f90-4906-b0d1-1c5330cff6a8",
+   "contact": "c007",
+   "interaction": "a9518a61-466f-47b1-92de-cf7fb8b5cbc2",
+   "type": "offer",
+   "category": "customers",
+   "description": "Budget-approved buyer for delivery/routing software",
+   "supporting_text": "she has budget approved for Q4",
+   "quote_verified": true,
+   "is_inferred": true,
+   "time_sensitive": true,
+   "confidence": 0.5,
+   "status": "active",
+   "relevant_until": "2026-12-31"
+  },
+  {
+   "key": "ca0bebfa-32d2-4955-9570-1491d4e1e0c5",
+   "contact": "c012",
+   "interaction": "8d56682c-1f53-4bb6-b4ea-525aefe67525",
+   "type": "need",
+   "category": "customers",
+   "description": "Referrals for two new B2B podcast clients this fall",
+   "supporting_text": "They have capacity for two new clients this fall and he asked me for referrals.",
+   "quote_verified": true,
+   "is_inferred": false,
+   "time_sensitive": true,
+   "confidence": 0.95,
+   "status": "active",
+   "relevant_until": "2026-12-21"
+  },
+  {
+   "key": "5d1f2f87-5658-4625-b490-0f073a66ecf9",
+   "contact": "c012",
+   "interaction": "8d56682c-1f53-4bb6-b4ea-525aefe67525",
+   "type": "offer",
+   "category": "services",
+   "description": "End-to-end B2B podcast production services",
+   "supporting_text": "Ben's agency Signal Studio produces B2B podcasts end-to-end - strategy, guest booking, editing.",
+   "quote_verified": true,
+   "is_inferred": false,
+   "time_sensitive": false,
+   "confidence": 0.95,
+   "status": "active",
+   "relevant_until": null
+  },
+  {
+   "key": "46791bdf-630c-482f-bbd3-135f72c77b72",
+   "contact": "c013",
+   "interaction": "4b8c9fe7-e655-4949-bc0c-1f60cc9ae6e6",
+   "type": "need",
+   "category": "vendors",
+   "description": "Austin office space before January move",
+   "supporting_text": "Kevin said Tallgrass needs office space in Austin before their January move.",
+   "quote_verified": true,
+   "is_inferred": false,
+   "time_sensitive": true,
+   "confidence": 0.95,
+   "status": "active",
+   "relevant_until": "2026-01-31"
+  },
+  {
+   "key": "fd37b7bf-c29e-4077-885c-50f69586d3e3",
+   "contact": "c013",
+   "interaction": "4b8c9fe7-e655-4949-bc0c-1f60cc9ae6e6",
+   "type": "need",
+   "category": "vendors",
+   "description": "Commercial real estate broker introductions in Austin",
+   "supporting_text": "Asked if I knew any commercial real estate brokers.",
+   "quote_verified": true,
+   "is_inferred": false,
+   "time_sensitive": true,
+   "confidence": 0.9,
+   "status": "active",
+   "relevant_until": "2026-01-31"
+  },
+  {
+   "key": "cd5acf65-4004-4408-952f-216fdfae9094",
+   "contact": "c026",
+   "interaction": "5b6784e3-9d24-4fc1-8034-5ffd5a520f13",
+   "type": "need",
+   "category": "customers",
+   "description": "Introductions to startup CEOs as recruiting clients",
+   "supporting_text": "asked me to introduce her to as many startup CEOs as possible so she can pitch her recruiting services",
+   "quote_verified": true,
+   "is_inferred": false,
+   "time_sensitive": false,
+   "confidence": 0.95,
+   "status": "active",
+   "relevant_until": null
+  },
+  {
+   "key": "b4cadc7f-9208-468a-9115-b00c281bba55",
+   "contact": "c026",
+   "interaction": "5b6784e3-9d24-4fc1-8034-5ffd5a520f13",
+   "type": "offer",
+   "category": "services",
+   "description": "Recruiting services for startups",
+   "supporting_text": "Rachel runs a recruiting firm",
+   "quote_verified": true,
+   "is_inferred": false,
+   "time_sensitive": false,
+   "confidence": 0.9,
+   "status": "active",
+   "relevant_until": null
+  },
+  {
+   "key": "7ea7dd83-ef39-4fa9-9c93-90b8423d8c69",
+   "contact": "c010",
+   "interaction": "3f0457d7-d4b8-4654-b4a8-0fd8e889e03c",
+   "type": "need",
+   "category": "investing",
+   "description": "Series A/B healthcare and fintech deal flow",
+   "supporting_text": "Sequel is focused on Series A and B healthcare and fintech companies with at least $2M ARR",
+   "quote_verified": true,
+   "is_inferred": true,
+   "time_sensitive": false,
+   "confidence": 0.45,
+   "status": "active",
+   "relevant_until": null
+  },
+  {
+   "key": "b15f91ad-817d-4f9c-9632-dd65a4ee2c0e",
+   "contact": "c010",
+   "interaction": "3f0457d7-d4b8-4654-b4a8-0fd8e889e03c",
+   "type": "offer",
+   "category": "fundraising",
+   "description": "Series A/B capital for healthcare and fintech",
+   "supporting_text": "Sequel is focused on Series A and B healthcare and fintech companies with at least $2M ARR",
+   "quote_verified": true,
+   "is_inferred": false,
+   "time_sensitive": false,
+   "confidence": 0.9,
+   "status": "active",
+   "relevant_until": null
+  }
+ ],
+ "opportunities": [
+  {
+   "recipient": "c010",
+   "proposed": "c001",
+   "need": "7ea7dd83-ef39-4fa9-9c93-90b8423d8c69",
+   "offer": null,
+   "value_proposition": "None: MedLoop is raising seed, outside Hannah's criteria.",
+   "why_proposed": "Healthcare AI looks like a fit, but MedLoop is raising a seed round.",
+   "why_now": null,
+   "give_value": 0,
+   "timeliness": 0,
+   "match_confidence": 0.85,
+   "match_basis": "profile_inference",
+   "appropriate": false,
+   "concerns": "Hannah explicitly refuses seed intros; Sarah's raise may be confidential.",
+   "missing_evidence": null,
+   "consent_status": "not_requested",
+   "status": "suggested",
+   "deferred_until": null,
+   "draft_message": null,
+   "draft_kind": null
+  },
+  {
+   "recipient": "c026",
+   "proposed": "c004",
+   "need": "cd5acf65-4004-4408-952f-216fdfae9094",
+   "offer": null,
+   "value_proposition": "Rachel gets a CEO with a live VP Engineering search.",
+   "why_proposed": "David needs a VP Engineering by Q1 after a previous search fell through.",
+   "why_now": "VP Engineering hire needed by Q1.",
+   "give_value": 3,
+   "timeliness": 4,
+   "match_confidence": 0.5,
+   "match_basis": "profile_inference",
+   "appropriate": true,
+   "concerns": "Ask David first; weak tie to Rachel; no volume CEO intros.",
+   "missing_evidence": "Whether David wants recruiters; TalentForge's engineering-leadership track record.",
+   "consent_status": "not_requested",
+   "status": "suggested",
+   "deferred_until": null,
+   "draft_message": null,
+   "draft_kind": null
+  },
+  {
+   "recipient": "c010",
+   "proposed": "c004",
+   "need": "7ea7dd83-ef39-4fa9-9c93-90b8423d8c69",
+   "offer": null,
+   "value_proposition": "Hannah gets a possible fintech deal if Ledgerline meets her bar.",
+   "why_proposed": "Ledgerline is fintech, within Sequel's sector focus.",
+   "why_now": null,
+   "give_value": 2,
+   "timeliness": 1,
+   "match_confidence": 0.3,
+   "match_basis": "profile_inference",
+   "appropriate": true,
+   "concerns": "Introduce only if Ledgerline is Series A+ with $2M+ ARR.",
+   "missing_evidence": "Ledgerline's stage, ARR, and whether David is raising.",
+   "consent_status": "not_requested",
+   "status": "suggested",
+   "deferred_until": null,
+   "draft_message": null,
+   "draft_kind": null
+  },
+  {
+   "recipient": "c011",
+   "proposed": "c012",
+   "need": "91a77dff-186d-4e94-9403-f268b2716608",
+   "offer": "5d1f2f87-5658-4625-b490-0f073a66ecf9",
+   "value_proposition": "End-to-end B2B podcast agency to hit January launch",
+   "why_proposed": "Signal Studio produces B2B podcasts end-to-end: strategy, guest booking, editing.",
+   "why_now": "January launch; Ben's fall capacity may fill",
+   "give_value": 5,
+   "timeliness": 5,
+   "match_confidence": 0.9,
+   "match_basis": "stated_offer",
+   "appropriate": true,
+   "concerns": null,
+   "missing_evidence": "Whether consumer-goods brands fit Ben's ideal client profile and budget.",
+   "consent_status": "not_requested",
+   "status": "suggested",
+   "deferred_until": null,
+   "draft_message": "Hi Olivia,\n\nYou mentioned you're looking for a podcast production agency that really gets B2B and can help you launch by January. I know a founder whose studio produces B2B podcasts end to end, from planning through editing and distribution. It's squarely their focus, and they're taking on new clients this fall, so the timing could work well.\n\nWould an intro be helpful? If so, I'll check with them first and then connect you both.\n\nBest,\nAlonso",
+   "draft_kind": "ask_recipient"
+  },
+  {
+   "recipient": "c011",
+   "proposed": "c007",
+   "need": "ac604152-c60f-4a49-b6c2-7e04a4c68805",
+   "offer": null,
+   "value_proposition": "Retail-chain contact as potential wholesale channel or podcast guest",
+   "why_proposed": "Grace is VP Operations at Brightmart Stores, a retailer; possible wholesale insight.",
+   "why_now": null,
+   "give_value": 2,
+   "timeliness": 1,
+   "match_confidence": 0.3,
+   "match_basis": "profile_inference",
+   "appropriate": true,
+   "concerns": "Ops, not merchandising/buying; may not own wholesale decisions.",
+   "missing_evidence": "Whether Brightmart carries consumer goods like Bloom's.",
+   "consent_status": "not_requested",
+   "status": "suggested",
+   "deferred_until": null,
+   "draft_message": null,
+   "draft_kind": null
+  },
+  {
+   "recipient": "c006",
+   "proposed": "c007",
+   "need": "e8b721ba-391f-4a31-b44d-7b1cc4417d9f",
+   "offer": "9855b85f-6f90-4906-b0d1-1c5330cff6a8",
+   "value_proposition": "Retail ops leader with Q4 budget for delivery/routing software",
+   "why_proposed": "Grace runs operations at Brightmart Stores and is evaluating routing software with approved budget.",
+   "why_now": "Evaluation this quarter; budget approved for Q4",
+   "give_value": 5,
+   "timeliness": 5,
+   "match_confidence": 0.6,
+   "match_basis": "stated_offer",
+   "appropriate": true,
+   "concerns": "Buyer offer is inferred; confirm Grace welcomes vendor intros.",
+   "missing_evidence": "Brightmart's size and whether Grace is final decision-maker.",
+   "consent_status": "not_requested",
+   "status": "suggested",
+   "deferred_until": null,
+   "draft_message": "Hi Tom,\n\nYou mentioned you'd love intros to operations leaders at retail chains. I know someone who might be a great fit. She's VP of Operations at a mid-size retail chain and is currently looking at delivery and routing software, so the timing could be good on both sides.\n\nWould you like me to connect you? If so, I'll check with her first to make sure she's open to it, then make the introduction.\n\nBest,\nAlonso",
+   "draft_kind": "ask_recipient"
+  },
+  {
+   "recipient": "c007",
+   "proposed": "c006",
+   "need": "df621c08-011c-4bad-be7e-04be4e0e4a07",
+   "offer": null,
+   "value_proposition": "Grace gets a routing software vendor; Tom gets a budget-approved retail buyer.",
+   "why_proposed": "Routewise is logistics SaaS; notes say Tom targets operations leaders at retail chains.",
+   "why_now": "Brightmart evaluating vendors now; Q4 budget approved.",
+   "give_value": 5,
+   "timeliness": 4,
+   "match_confidence": 0.7,
+   "match_basis": "profile_inference",
+   "appropriate": true,
+   "concerns": "Customer intro only; Tom wants no investor intros.",
+   "missing_evidence": "Whether Routewise fits Brightmart's fleet, integration needs; evaluation may have closed.",
+   "consent_status": "not_requested",
+   "status": "suggested",
+   "deferred_until": null,
+   "draft_message": null,
+   "draft_kind": null
+  },
+  {
+   "recipient": "c002",
+   "proposed": "c001",
+   "need": "5c6a4ce1-96ef-456f-8e2f-1b861d550fb4",
+   "offer": null,
+   "value_proposition": "Seed-stage digital health founder Alonso can vouch for",
+   "why_proposed": "MedLoop AI is a seed-stage healthcare AI company, fitting Northbeam's seed/Series A thesis.",
+   "why_now": "Fund III deploying; MedLoop seed closes November",
+   "give_value": 5,
+   "timeliness": 5,
+   "match_confidence": 0.75,
+   "match_basis": "profile_inference",
+   "appropriate": true,
+   "concerns": "Same deal as N9; ask Sarah privately before sharing raise details.",
+   "missing_evidence": "Whether the round is already fully allocated.",
+   "consent_status": "not_requested",
+   "status": "suggested",
+   "deferred_until": null,
+   "draft_message": "Hi Michael,\n\nYou mentioned wanting to see more early-stage digital health deals at seed and Series A. I know a CEO and co-founder of a seed-stage healthcare AI company who seems like a strong fit for Northbeam's focus, and I think the conversation could be useful on both sides.\n\nWould you like an introduction? If so, I'll check with them first and only connect you if they're open to it.\n\nBest,\nAlonso",
+   "draft_kind": "ask_recipient"
+  },
+  {
+   "recipient": "c001",
+   "proposed": "c010",
+   "need": "4c443053-b450-43fd-b461-874c0a9e04f3",
+   "offer": "b15f91ad-817d-4f9c-9632-dd65a4ee2c0e",
+   "value_proposition": "None now: Sequel doesn't do seed",
+   "why_proposed": "Healthcare-focused VC, but Series A+ with $2M ARR minimum only.",
+   "why_now": null,
+   "give_value": 0,
+   "timeliness": 1,
+   "match_confidence": 0.9,
+   "match_basis": "stated_offer",
+   "appropriate": false,
+   "concerns": "Hannah explicitly forbids seed intros; violates her stated preference.",
+   "missing_evidence": null,
+   "consent_status": "not_requested",
+   "status": "suggested",
+   "deferred_until": null,
+   "draft_message": null,
+   "draft_kind": null
+  },
+  {
+   "recipient": "c004",
+   "proposed": "c019",
+   "need": "06d0ed35-aa7b-42a7-abab-d021a09b693b",
+   "offer": null,
+   "value_proposition": "Executive recruiter to run a backup VP Eng search",
+   "why_proposed": "Chris is an executive recruiter at Summit Talent; no recorded payments specialization.",
+   "why_now": "Q1 deadline after failed search",
+   "give_value": 2,
+   "timeliness": 4,
+   "match_confidence": 0.35,
+   "match_basis": "profile_inference",
+   "appropriate": true,
+   "concerns": "Unclear if David wants search firms; weak 2/5 relationship.",
+   "missing_evidence": "Chris's fintech/engineering search track record.",
+   "consent_status": "not_requested",
+   "status": "suggested",
+   "deferred_until": null,
+   "draft_message": null,
+   "draft_kind": null
+  },
+  {
+   "recipient": "c004",
+   "proposed": "c026",
+   "need": "06d0ed35-aa7b-42a7-abab-d021a09b693b",
+   "offer": "b4cadc7f-9208-468a-9115-b00c281bba55",
+   "value_proposition": "Recruiting firm capacity for the VP Eng search",
+   "why_proposed": "Rachel runs TalentForge, offering startup recruiting services.",
+   "why_now": "Q1 hiring deadline",
+   "give_value": 2,
+   "timeliness": 3,
+   "match_confidence": 0.35,
+   "match_basis": "stated_offer",
+   "appropriate": true,
+   "concerns": "Rachel wants volume sales intros; 1/5 relationship. Ask David first.",
+   "missing_evidence": "TalentForge's specialization and executive-level track record.",
+   "consent_status": "not_requested",
+   "status": "suggested",
+   "deferred_until": null,
+   "draft_message": null,
+   "draft_kind": null
+  },
+  {
+   "recipient": "c002",
+   "proposed": "c001",
+   "need": "ac23326e-5b28-47a7-8aaf-95011c0822a3",
+   "offer": null,
+   "value_proposition": "Seed-stage hospital AI company with 2 signed hospital pilots",
+   "why_proposed": "Sarah's MedLoop AI is healthcare AI raising a seed round, with hospital pilots signed.",
+   "why_now": "Fund III just closed; MedLoop seed closes November",
+   "give_value": 5,
+   "timeliness": 5,
+   "match_confidence": 0.75,
+   "match_basis": "profile_inference",
+   "appropriate": true,
+   "concerns": "Raise may be confidential; confirm Sarah wants investor intros first.",
+   "missing_evidence": "Raise status, lead investor, and pilot outcomes.",
+   "consent_status": "not_requested",
+   "status": "suggested",
+   "deferred_until": null,
+   "draft_message": null,
+   "draft_kind": null
+  },
+  {
+   "recipient": "c001",
+   "proposed": "c003",
+   "need": "83154808-3717-48b1-b77a-f743796c435f",
+   "offer": "8ae15e52-ad03-41a8-ab73-7fb892533eba",
+   "value_proposition": "Nine years of hospital-system enterprise sales leadership as advisor",
+   "why_proposed": "Ran HealthGrid enterprise sales into hospitals 9 years; wants early-stage healthcare advisory roles.",
+   "why_now": "Priya newly available; MedLoop scaling sales pre-seed",
+   "give_value": 5,
+   "timeliness": 4,
+   "match_confidence": 0.9,
+   "match_basis": "stated_offer",
+   "appropriate": true,
+   "concerns": "Priya prefers equity and has limited 2-3 role capacity.",
+   "missing_evidence": "MedLoop's advisor compensation terms",
+   "consent_status": "not_requested",
+   "status": "suggested",
+   "deferred_until": null,
+   "draft_message": "Hi Sarah,\n\nYou mentioned you're looking for an enterprise sales advisor who has sold into health systems. I know someone who could be a strong fit. She spent nine years running enterprise sales into hospitals as a VP at a health tech company, and she's now advising independently and interested in working with early-stage healthcare startups.\n\nWould you like an introduction? If so, I'll check with her first to make sure the timing works on her end, then connect you both.\n\nBest,\nAlonso",
+   "draft_kind": "ask_recipient"
+  },
+  {
+   "recipient": "c007",
+   "proposed": "c021",
+   "need": "df621c08-011c-4bad-be7e-04be4e0e4a07",
+   "offer": null,
+   "value_proposition": "Possible alternative vendor or peer view on delivery logistics.",
+   "why_proposed": "Omar runs Packwise, e-commerce logistics; unclear if it sells routing software.",
+   "why_now": "Active vendor evaluation this quarter.",
+   "give_value": 2,
+   "timeliness": 4,
+   "match_confidence": 0.3,
+   "match_basis": "profile_inference",
+   "appropriate": true,
+   "concerns": null,
+   "missing_evidence": "Whether Packwise offers retail delivery/routing software at all.",
+   "consent_status": "not_requested",
+   "status": "suggested",
+   "deferred_until": null,
+   "draft_message": null,
+   "draft_kind": null
+  },
+  {
+   "recipient": "c001",
+   "proposed": "c002",
+   "need": "4c443053-b450-43fd-b461-874c0a9e04f3",
+   "offer": "bd3a88fa-4fbc-4112-ac0b-90c84de463ce",
+   "value_proposition": "Warm intro to a GP deploying a fresh seed fund",
+   "why_proposed": "Northbeam's new Fund III writes seed checks; Michael meets founders Alonso vouches for.",
+   "why_now": "Fund III just closed; MedLoop seed raise in November",
+   "give_value": 5,
+   "timeliness": 5,
+   "match_confidence": 0.75,
+   "match_basis": "stated_offer",
+   "appropriate": true,
+   "concerns": "Raise details may be confidential; confirm with Sarah what to share.",
+   "missing_evidence": "Whether Northbeam invests in digital health; check size vs $4M round",
+   "consent_status": "not_requested",
+   "status": "suggested",
+   "deferred_until": null,
+   "draft_message": "Hi Sarah,\n\nYou mentioned wanting intros to digital health investors ahead of your raise. I know a GP at a seed/Series A fund that just closed a new fund and is actively looking at early-stage AI tools for hospitals. He takes meetings with founders I vouch for, and I think MedLoop would be a strong fit.\n\nWould you like an introduction? If so, I'll check with him first, and let me know what you're comfortable with me sharing about the round.\n\nAlonso",
+   "draft_kind": "ask_recipient"
+  },
+  {
+   "recipient": "c001",
+   "proposed": "c020",
+   "need": "4c443053-b450-43fd-b461-874c0a9e04f3",
+   "offer": null,
+   "value_proposition": "Possible angel check to fill out the seed round",
+   "why_proposed": "Angel investor by title; no stated sector or stage focus.",
+   "why_now": "Seed round targeted for November",
+   "give_value": 2,
+   "timeliness": 4,
+   "match_confidence": 0.3,
+   "match_basis": "profile_inference",
+   "appropriate": true,
+   "concerns": "Fundraising may be sensitive; get Sarah's OK first.",
+   "missing_evidence": "Natalie's interest in healthcare AI and check size",
+   "consent_status": "not_requested",
+   "status": "suggested",
+   "deferred_until": null,
+   "draft_message": null,
+   "draft_kind": null
+  },
+  {
+   "recipient": "c005",
+   "proposed": "c004",
+   "need": "9427c80a-46de-46fc-80c7-43e8294ed2e8",
+   "offer": null,
+   "value_proposition": "Direct line to a fintech CEO actively needing a VP Engineering",
+   "why_proposed": "Notes show Ledgerline's VP Engineering search fell through; David must hire by Q1.",
+   "why_now": "David's VP Eng hire targeted by Q1; prior search failed",
+   "give_value": 5,
+   "timeliness": 5,
+   "match_confidence": 0.7,
+   "match_basis": "profile_inference",
+   "appropriate": true,
+   "concerns": "Elena's search is confidential; get her explicit opt-in before sharing anything.",
+   "missing_evidence": "Whether Ledgerline's role is still open and Elena's location/comp needs",
+   "consent_status": "not_requested",
+   "status": "suggested",
+   "deferred_until": null,
+   "draft_message": null,
+   "draft_kind": null
+  },
+  {
+   "recipient": "c005",
+   "proposed": "c019",
+   "need": "9427c80a-46de-46fc-80c7-43e8294ed2e8",
+   "offer": null,
+   "value_proposition": "Access to executive search pipeline for VP Engineering roles",
+   "why_proposed": "Executive recruiter by title; no stated fintech or engineering focus.",
+   "why_now": null,
+   "give_value": 2,
+   "timeliness": 2,
+   "match_confidence": 0.35,
+   "match_basis": "profile_inference",
+   "appropriate": true,
+   "concerns": "Weak tie (2/5); confidentiality risk. Elena's explicit consent required first.",
+   "missing_evidence": "Chris's specialization and discretion track record",
+   "consent_status": "not_requested",
+   "status": "suggested",
+   "deferred_until": null,
+   "draft_message": null,
+   "draft_kind": null
+  },
+  {
+   "recipient": "c005",
+   "proposed": "c004",
+   "need": "c55522c3-642a-4283-a072-e8ed40af67f8",
+   "offer": null,
+   "value_proposition": "Lead engineering at a payments fintech; ledger rebuild experience directly relevant",
+   "why_proposed": "Ledgerline is payments-focused fintech hiring VP Engineering; Elena led Paystream ledger rebuild.",
+   "why_now": "Ledgerline needs VP Eng hired by Q1",
+   "give_value": 5,
+   "timeliness": 5,
+   "match_confidence": 0.7,
+   "match_basis": "profile_inference",
+   "appropriate": true,
+   "concerns": "Confidential search; opt-in only. Don't share Paystream-specific details.",
+   "missing_evidence": "Scope of Ledgerline's infrastructure roadmap and team size",
+   "consent_status": "not_requested",
+   "status": "suggested",
+   "deferred_until": null,
+   "draft_message": null,
+   "draft_kind": null
+  },
+  {
+   "recipient": "c003",
+   "proposed": "c001",
+   "need": "0cce02a2-29c6-4d43-bd79-8418a3a7a8de",
+   "offer": null,
+   "value_proposition": "Advisory role at early-stage healthcare AI startup with signed hospital pilots",
+   "why_proposed": "Sarah explicitly seeks an enterprise sales advisor who has sold to health systems.",
+   "why_now": "MedLoop raising seed in November; scaling hospital sales",
+   "give_value": 5,
+   "timeliness": 4,
+   "match_confidence": 0.85,
+   "match_basis": "profile_inference",
+   "appropriate": true,
+   "concerns": "Priya wants equity; MedLoop's advisor compensation unknown.",
+   "missing_evidence": "Whether MedLoop offers equity for the advisor role",
+   "consent_status": "not_requested",
+   "status": "suggested",
+   "deferred_until": null,
+   "draft_message": null,
+   "draft_kind": null
+  },
+  {
+   "recipient": "c003",
+   "proposed": "c002",
+   "need": "0cce02a2-29c6-4d43-bd79-8418a3a7a8de",
+   "offer": "6fd2155c-693f-48e2-840f-75f28e995fb8",
+   "value_proposition": "Potential pipeline of portfolio companies needing GTM/sales advisors",
+   "why_proposed": "Michael mentioned portfolio needs GTM help; possibly healthcare-focused fund.",
+   "why_now": "Northbeam just closed Fund III; new portfolio forming",
+   "give_value": 2,
+   "timeliness": 3,
+   "match_confidence": 0.35,
+   "match_basis": "profile_inference",
+   "appropriate": true,
+   "concerns": "Referral intent is inferred; Priya's 2-3 role limit means be selective.",
+   "missing_evidence": "Whether Northbeam portfolio includes early-stage healthcare companies",
+   "consent_status": "not_requested",
+   "status": "suggested",
+   "deferred_until": null,
+   "draft_message": null,
+   "draft_kind": null
+  },
+  {
+   "recipient": "c003",
+   "proposed": "c001",
+   "need": "7fa4f9a3-1a83-47a4-ba1f-0d28994eead5",
+   "offer": null,
+   "value_proposition": "Meet an early-stage healthcare AI founder actively seeking her expertise",
+   "why_proposed": "Sarah is a healthcare AI co-founder with stated need for health-system sales help.",
+   "why_now": "Pre-seed-close sales build-out at MedLoop",
+   "give_value": 5,
+   "timeliness": 4,
+   "match_confidence": 0.85,
+   "match_basis": "profile_inference",
+   "appropriate": true,
+   "concerns": null,
+   "missing_evidence": null,
+   "consent_status": "not_requested",
+   "status": "suggested",
+   "deferred_until": null,
+   "draft_message": "Hi Priya,\n\nYou mentioned you're open to meeting founders, and someone came to mind. She's the CEO and co-founder of an early-stage healthcare AI company that already has signed pilots with hospitals. As they work on turning those pilots into lasting health system relationships, your experience selling into enterprise health could be really valuable to her.\n\nWould you like an introduction? If so, I'll check with her first and connect you both if she's up for it.\n\nBest,\nAlonso",
+   "draft_kind": "ask_recipient"
+  },
+  {
+   "recipient": "c004",
+   "proposed": "c005",
+   "need": "06d0ed35-aa7b-42a7-abab-d021a09b693b",
+   "offer": "42235526-4a58-462d-b4f5-6db89a085d1f",
+   "value_proposition": "Candidate who led a 3-year payments ledger rebuild, fills Q1 VP Eng gap",
+   "why_proposed": "Elena led Paystream's ledger rebuild for 3 years and is quietly job searching.",
+   "why_now": "Last search fell through; David needs someone by Q1",
+   "give_value": 5,
+   "timeliness": 5,
+   "match_confidence": 0.8,
+   "match_basis": "stated_offer",
+   "appropriate": true,
+   "concerns": "Confidential search: get Elena's explicit opt-in first; never mention to Paystream.",
+   "missing_evidence": "Whether Elena wants a VP-level role at an early-stage fintech.",
+   "consent_status": "not_requested",
+   "status": "suggested",
+   "deferred_until": null,
+   "draft_message": "Hi David,\n\nI may know someone for your VP of Engineering search. They're currently a senior engineering leader at a payments company and spent the last three years leading a major rebuild of their core ledger, so scaling payments infrastructure is exactly their background. I think they'd be worth a conversation given your Q1 timeline.\n\nWould you like an introduction? If so, I'll check with them privately first and only connect you if they're open to it.\n\nBest,\nAlonso",
+   "draft_kind": "ask_recipient"
+  },
+  {
+   "recipient": "c012",
+   "proposed": "c011",
+   "need": "ca0bebfa-32d2-4955-9570-1491d4e1e0c5",
+   "offer": null,
+   "value_proposition": "Ben gets a warm podcast client lead; Olivia gets end-to-end production.",
+   "why_proposed": "Notes indicate Bloom & Co plans a January podcast, likely aimed at wholesale partners.",
+   "why_now": "January launch; Ben's fall capacity may fill.",
+   "give_value": 4,
+   "timeliness": 4,
+   "match_confidence": 0.6,
+   "match_basis": "profile_inference",
+   "appropriate": true,
+   "concerns": "Bloom is consumer goods; Ben does B2B podcasts.",
+   "missing_evidence": "Olivia's budget and whether the podcast targets B2B audiences.",
+   "consent_status": "not_requested",
+   "status": "suggested",
+   "deferred_until": null,
+   "draft_message": null,
+   "draft_kind": null
+  },
+  {
+   "recipient": "c003",
+   "proposed": "c002",
+   "need": "7fa4f9a3-1a83-47a4-ba1f-0d28994eead5",
+   "offer": "6fd2155c-693f-48e2-840f-75f28e995fb8",
+   "value_proposition": "VP-level connector to his portfolio's healthcare founders",
+   "why_proposed": "GP whose portfolio companies need GTM help; may route founders to Priya.",
+   "why_now": "Fund III newly closed",
+   "give_value": 2,
+   "timeliness": 3,
+   "match_confidence": 0.35,
+   "match_basis": "profile_inference",
+   "appropriate": true,
+   "concerns": "Inferred referral willingness; frame as optional, low-pressure.",
+   "missing_evidence": "Northbeam's healthcare portfolio composition",
+   "consent_status": "not_requested",
+   "status": "suggested",
+   "deferred_until": null,
+   "draft_message": null,
+   "draft_kind": null
+  },
+  {
+   "recipient": "c005",
+   "proposed": "c026",
+   "need": "9427c80a-46de-46fc-80c7-43e8294ed2e8",
+   "offer": "b4cadc7f-9208-468a-9115-b00c281bba55",
+   "value_proposition": "Little: Rachel seeks CEO clients, not candidates",
+   "why_proposed": "Runs recruiting firm, but wants volume CEO intros to pitch services.",
+   "why_now": null,
+   "give_value": 1,
+   "timeliness": 1,
+   "match_confidence": 0.3,
+   "match_basis": "stated_offer",
+   "appropriate": false,
+   "concerns": "Weak tie (1/5), unknown specialization; real risk of exposing confidential search.",
+   "missing_evidence": "TalentForge's focus and confidentiality practices",
+   "consent_status": "not_requested",
+   "status": "suggested",
+   "deferred_until": null,
+   "draft_message": null,
+   "draft_kind": null
+  }
+ ]
+}

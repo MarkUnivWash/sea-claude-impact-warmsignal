@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { structuredCall } from "./claude";
-import { db, must } from "./supabase";
+import { must, type Ctx } from "./supabase";
 import type { Contact } from "./types";
 
 // Stage A (PRD §8): raw conversation note -> structured needs/offers with evidence.
@@ -65,14 +65,16 @@ ${notes}
 const normalize = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
 
 /** Saves a note, runs extraction, stores needs/offers. Returns the interaction id. */
-export async function ingestNote(contactId: string, date: string, notes: string): Promise<string> {
-  const supabase = db();
-  const contact = must<Contact>(await supabase.from("contacts").select("*").eq("id", contactId).single());
+export async function ingestNote(ctx: Ctx, contactId: string, date: string, notes: string): Promise<string> {
+  const { db: supabase, ownerId } = ctx;
+  const contact = must<Contact>(
+    await supabase.from("contacts").select("*").eq("owner_id", ownerId).eq("id", contactId).single(),
+  );
 
   const interaction = must<{ id: string }>(
     await supabase
       .from("interactions")
-      .insert({ contact_id: contactId, date, raw_notes: notes })
+      .insert({ owner_id: ownerId, contact_id: contactId, date, raw_notes: notes })
       .select("id")
       .single(),
   );
@@ -82,6 +84,7 @@ export async function ingestNote(contactId: string, date: string, notes: string)
 
   const rows = (["needs", "offers"] as const).flatMap((key) =>
     extraction[key].map((s) => ({
+      owner_id: ownerId,
       contact_id: contactId,
       interaction_id: interaction.id,
       type: key === "needs" ? "need" : "offer",
@@ -104,12 +107,19 @@ export async function ingestNote(contactId: string, date: string, notes: string)
         context: { summary: extraction.summary, uncertainties: extraction.uncertainties },
         extracted_at: new Date().toISOString(),
       })
+      .eq("owner_id", ownerId)
       .eq("id", interaction.id),
   );
 
   // A logged conversation is a meaningful interaction.
   if (!contact.last_interaction_date || date > contact.last_interaction_date) {
-    must(await supabase.from("contacts").update({ last_interaction_date: date }).eq("id", contactId));
+    must(
+      await supabase
+        .from("contacts")
+        .update({ last_interaction_date: date })
+        .eq("owner_id", ownerId)
+        .eq("id", contactId),
+    );
   }
 
   return interaction.id;

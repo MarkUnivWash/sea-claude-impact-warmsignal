@@ -2,5 +2,45 @@
 
 @theme inline {
   --font-sans: var(--font-sans-face);
-  --font-serif: var(--font-serif-face);
+}
+
+@theme {
+  /* Deep indigo used for primary actions and headings accents. */
+  --color-ink-50: #f4f5fe;
+  --color-ink-100: #e9eafc;
+  --color-ink-200: #d4d6f8;
+  --color-ink-300: #b4b7f2;
+  --color-ink-400: #8b8ff0;
+  --color-ink-500: #6366f1;
+  --color-ink-600: #4f46e5;
+  --color-ink-700: #3f3a9e;
+  --color-ink-800: #312c7a;
+  --color-ink-900: #262262;
+
+  --shadow-card: 0 1px 2px rgb(30 27 75 / 0.04), 0 4px 16px -4px rgb(30 27 75 / 0.06);
+  --shadow-card-lg: 0 1px 2px rgb(30 27 75 / 0.04), 0 12px 32px -8px rgb(30 27 75 / 0.12);
+
+  --animate-rise: rise 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  }
+}
+
+body {
+  background: #f8f9fc;
+}
+
+/* Native <details> chevrons are replaced with our own icons. */
+summary {
+  list-style: none;
+}
+summary::-webkit-details-marker {
+  display: none;
+}
+
+::selection {
+  background: var(--color-ink-100);
 }

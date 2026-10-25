@@ -1,5 +1,6 @@
 "use client";
 
+import { LoaderCircle } from "lucide-react";
 import { useFormStatus } from "react-dom";
 
 export function SubmitButton({
@@ -15,16 +16,25 @@ export function SubmitButton({
   name?: string;
   value?: string;
 }) {
-  const { pending } = useFormStatus();
+  const { pending, data } = useFormStatus();
+  // Only the button that submitted the form shows the pending state when a form has several.
+  const mine = pending && (name == null || data?.get(name) === value);
   return (
     <button
       type="submit"
       name={name}
       value={value}
       disabled={pending}
-      className={`rounded-md px-3 py-1.5 text-sm font-medium transition disabled:cursor-wait disabled:opacity-60 ${className}`}
+      className={`inline-flex items-center justify-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium transition active:scale-[0.98] disabled:cursor-wait disabled:opacity-70 ${className}`}
     >
-      {pending ? (pendingText ?? "Working…") : children}
+      {mine ? (
+        <>
+          <LoaderCircle className="size-4 animate-spin" />
+          {pendingText ?? "Working…"}
+        </>
+      ) : (
+        children
+      )}
     </button>
   );
 }

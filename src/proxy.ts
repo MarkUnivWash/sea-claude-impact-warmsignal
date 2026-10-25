@@ -1,21 +1,43 @@
+import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-// Minimal shared-password gate (HTTP Basic auth) for the deployed demo.
-// Contact notes are private: set APP_PASSWORD on Vercel. Unset = no gate (local dev).
-export function proxy(request: NextRequest) {
-  const password = process.env.APP_PASSWORD;
-  if (!password) return NextResponse.next();
+// Refreshes the Supabase session cookie on every request and sends signed-out users to /login.
+// Pages and server actions also check the user themselves (requireCtx); this is the first gate.
 
-  const header = request.headers.get("authorization") ?? "";
-  const [scheme, encoded] = header.split(" ");
-  if (scheme === "Basic" && encoded) {
-    const supplied = atob(encoded).split(":").slice(1).join(":");
-    if (supplied === password) return NextResponse.next();
-  }
-  return new NextResponse("Authentication required", {
-    status: 401,
-    headers: { "WWW-Authenticate": 'Basic realm="WarmSignal"' },
+const PUBLIC_PATHS = ["/login", "/signup"];
+
+export async function proxy(request: NextRequest) {
+  let response = NextResponse.next({ request });
+
+  const supabase = createServerClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!, {
+    cookies: {
+      getAll: () => request.cookies.getAll(),
+      setAll: (toSet, headers) => {
+        for (const { name, value } of toSet) request.cookies.set(name, value);
+        response = NextResponse.next({ request });
+        for (const { name, value, options } of toSet) response.cookies.set(name, value, options);
+        for (const [key, value] of Object.entries(headers ?? {})) response.headers.set(key, value);
+      },
+    },
   });
+
+  const { data } = await supabase.auth.getClaims();
+  const signedIn = Boolean(data?.claims?.sub);
+  const isPublic = PUBLIC_PATHS.includes(request.nextUrl.pathname);
+
+  if (!signedIn && !isPublic) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/login";
+    url.search = "";
+    return NextResponse.redirect(url);
+  }
+  if (signedIn && isPublic) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/";
+    url.search = "";
+    return NextResponse.redirect(url);
+  }
+  return response;
 }
 
 export const config = {

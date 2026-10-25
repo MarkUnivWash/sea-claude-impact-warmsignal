@@ -1,7 +1,7 @@
 import { tavily, type TavilySearchResponse } from "@tavily/core";
 import { z } from "zod";
 import { structuredCall } from "./claude";
-import { db, must } from "./supabase";
+import { must, type Ctx } from "./supabase";
 import type { Contact, Enrichment } from "./types";
 
 // Automatic contact enrichment: Tavily web search -> Claude identity check + summary.
@@ -99,30 +99,36 @@ ${results
   };
 }
 
-export async function enrichAndSave(contactId: string): Promise<Enrichment> {
-  const supabase = db();
-  const contact = must<Contact>(await supabase.from("contacts").select("*").eq("id", contactId).single());
+export async function enrichAndSave(ctx: Ctx, contactId: string): Promise<Enrichment> {
+  const { db: supabase, ownerId } = ctx;
+  const contact = must<Contact>(
+    await supabase.from("contacts").select("*").eq("owner_id", ownerId).eq("id", contactId).single(),
+  );
   const enrichment = await enrichContact(contact);
   must(
     await supabase
       .from("contacts")
       .update({ enrichment, enriched_at: new Date().toISOString() })
+      .eq("owner_id", ownerId)
       .eq("id", contactId),
   );
   return enrichment;
 }
 
 /** Enriches contacts that have never been enriched (or all, with force). */
-export async function enrichPending(opts: { force?: boolean; concurrency?: number } = {}): Promise<number> {
+export async function enrichPending(
+  ctx: Ctx,
+  opts: { force?: boolean; concurrency?: number } = {},
+): Promise<number> {
   if (!process.env.TAVILY_API_KEY) return 0;
-  let query = db().from("contacts").select("id").order("id");
+  let query = ctx.db.from("contacts").select("id").eq("owner_id", ctx.ownerId).order("id");
   if (!opts.force) query = query.is("enriched_at", null);
   const ids = must<{ id: string }[]>(await query).map((c) => c.id);
   const size = opts.concurrency ?? 5;
   for (let i = 0; i < ids.length; i += size) {
     await Promise.all(
       ids.slice(i, i + size).map((id) =>
-        enrichAndSave(id).catch((e) => console.error(`Enrichment failed for ${id}:`, e)),
+        enrichAndSave(ctx, id).catch((e) => console.error(`Enrichment failed for ${id}:`, e)),
       ),
     );
   }

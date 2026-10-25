@@ -1,76 +1,150 @@
 import Link from "next/link";
-import { enrichAllAction, importCsvAction } from "@/app/actions";
+import { ChevronRight, Globe, Info, Sparkles, Upload, Wand2 } from "lucide-react";
+import { enrichAllAction, importCsvAction, loadDemoAction, removeDemoAction } from "@/app/actions";
 import { SubmitButton } from "@/components/submit-button";
-import { db, must } from "@/lib/supabase";
+import { Avatar, btn, card, Chip, PageHeader, SignalBars } from "@/components/ui";
+import { requireCtx } from "@/lib/auth";
+import { hasDemoData } from "@/lib/demo";
+import { must } from "@/lib/supabase";
 import type { Contact } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
 export default async function ContactsPage() {
-  const supabase = db();
-  const [contacts, signals] = await Promise.all([
-    supabase.from("contacts").select("*").order("name").then((r) => must<Contact[]>(r)),
+  const ctx = await requireCtx();
+  const supabase = ctx.db;
+  const [contacts, signals, demoLoaded] = await Promise.all([
+    supabase.from("contacts").select("*").eq("owner_id", ctx.ownerId).order("name").then((r) => must<Contact[]>(r)),
     supabase
       .from("signals")
       .select("contact_id, type")
+      .eq("owner_id", ctx.ownerId)
       .eq("status", "active")
       .then((r) => must<{ contact_id: string; type: string }[]>(r)),
+    hasDemoData(ctx),
   ]);
   const counts = (id: string, type: string) => signals.filter((s) => s.contact_id === id && s.type === type).length;
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <h1 className="font-serif text-3xl font-semibold">Contacts ({contacts.length})</h1>
-        <form action={enrichAllAction}>
-          <SubmitButton pendingText="Enriching…" className="border border-stone-300 bg-white text-sm hover:bg-stone-100">
-            Enrich new contacts
-          </SubmitButton>
-        </form>
-        <form action={importCsvAction} className="flex items-center gap-2 text-sm">
-          <input type="file" name="file" accept=".csv,text/csv" className="text-sm" />
-          <SubmitButton className="border border-stone-300 bg-white hover:bg-stone-100">Import CSV</SubmitButton>
-        </form>
-      </div>
-      <p className="text-sm text-stone-500">
-        CSV columns: contact_id, name, company, title, industry, relationship_strength (1–5), last_interaction_date
-        (YYYY-MM-DD), introduction_preferences. Re-importing updates existing contacts by contact_id. New contacts are
-        enriched from the public web automatically (Tavily); only name, title and company are searched.
-      </p>
-      <table className="w-full overflow-hidden rounded-lg border border-stone-200 bg-white text-sm">
-        <thead className="bg-stone-100 text-left text-stone-600">
-          <tr>
-            <th className="px-3 py-2">Name</th>
-            <th className="px-3 py-2">Role</th>
-            <th className="px-3 py-2">Strength</th>
-            <th className="px-3 py-2">Last interaction</th>
-            <th className="px-3 py-2">Needs / Offers</th>
-            <th className="px-3 py-2">Web</th>
-          </tr>
-        </thead>
-        <tbody>
-          {contacts.map((c) => (
-            <tr key={c.id} className="border-t border-stone-100 hover:bg-amber-50/40">
-              <td className="px-3 py-2">
-                <Link href={`/contacts/${c.id}`} className="font-medium text-amber-700 hover:underline">
-                  {c.name}
-                </Link>
-              </td>
-              <td className="px-3 py-2 text-stone-600">
-                {c.title}, {c.company}
-              </td>
-              <td className="px-3 py-2">{"●".repeat(c.relationship_strength)}</td>
-              <td className="px-3 py-2 text-stone-600">{c.last_interaction_date ?? "—"}</td>
-              <td className="px-3 py-2 text-stone-600">
-                {counts(c.id, "need")} / {counts(c.id, "offer")}
-              </td>
-              <td className="px-3 py-2 text-xs text-stone-500">
-                {!c.enrichment ? "—" : c.enrichment.status === "matched" ? "✓ enriched" : "no match"}
-              </td>
+    <div className="space-y-8">
+      <PageHeader
+        eyebrow="Your network"
+        title={`${contacts.length} ${contacts.length === 1 ? "contact" : "contacts"}`}
+        subtitle="Everyone you could help, and everyone who could help someone else."
+        actions={
+          <>
+            <form action={demoLoaded ? removeDemoAction : loadDemoAction}>
+              <SubmitButton pendingText={demoLoaded ? "Removing…" : "Loading…"} className={btn.secondary}>
+                {!demoLoaded && <Sparkles className="size-4" />}
+                {demoLoaded ? "Remove demo contacts" : "Load demo contacts"}
+              </SubmitButton>
+            </form>
+            <form action={enrichAllAction}>
+              <SubmitButton pendingText="Enriching…" className={btn.secondary}>
+                <Wand2 className="size-4" /> Enrich new
+              </SubmitButton>
+            </form>
+          </>
+        }
+      />
+
+      <form
+        action={importCsvAction}
+        className={`${card} flex flex-wrap items-center gap-3 px-5 py-4 text-sm`}
+      >
+        <span className="flex size-9 items-center justify-center rounded-lg bg-ink-50 text-ink-600">
+          <Upload className="size-4" />
+        </span>
+        <div className="min-w-0 flex-1">
+          <div className="font-semibold text-slate-800">Import from CSV</div>
+          <div className="group relative inline-flex items-center gap-1 text-xs text-slate-500">
+            Re-importing updates contacts by contact_id. New contacts are enriched from the public web.
+            <Info className="size-3.5 text-slate-400" />
+            <span className="pointer-events-none absolute left-0 top-full z-10 mt-2 hidden w-80 rounded-lg bg-slate-900 px-3 py-2 text-xs leading-relaxed text-white shadow-lg group-hover:block">
+              Columns: contact_id, name, company, title, industry, relationship_strength (1–5), last_interaction_date
+              (YYYY-MM-DD), introduction_preferences. Only name, title and company are searched (Tavily).
+            </span>
+          </div>
+        </div>
+        <input
+          type="file"
+          name="file"
+          accept=".csv,text/csv"
+          className="max-w-56 text-xs text-slate-500 file:mr-3 file:rounded-lg file:border-0 file:bg-slate-100 file:px-3 file:py-2 file:text-sm file:font-medium file:text-slate-700 hover:file:bg-slate-200"
+        />
+        <SubmitButton pendingText="Importing…" className={btn.primary}>
+          Import
+        </SubmitButton>
+      </form>
+
+      <div className={`${card} overflow-hidden`}>
+        <table className="w-full text-sm">
+          <thead className="border-b border-slate-100 text-left text-xs font-medium uppercase tracking-wider text-slate-400">
+            <tr>
+              <th className="px-5 py-3 font-medium">Name</th>
+              <th className="hidden px-3 py-3 font-medium md:table-cell">Relationship</th>
+              <th className="hidden px-3 py-3 font-medium sm:table-cell">Last spoke</th>
+              <th className="px-3 py-3 font-medium">Signals</th>
+              <th className="hidden px-3 py-3 font-medium lg:table-cell">Web</th>
+              <th className="w-8" />
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody className="divide-y divide-slate-100">
+            {contacts.map((c) => {
+              const needs = counts(c.id, "need");
+              const offers = counts(c.id, "offer");
+              return (
+                <tr key={c.id} className="group relative transition hover:bg-ink-50/40">
+                  <td className="px-5 py-3">
+                    <div className="flex items-center gap-3">
+                      <Avatar name={c.name} size="md" />
+                      <div className="min-w-0">
+                        <Link href={`/contacts/${c.id}`} className="font-semibold text-slate-900 after:absolute after:inset-0">
+                          {c.name}
+                        </Link>
+                        <div className="truncate text-slate-500">{[c.title, c.company].filter(Boolean).join(", ")}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="hidden px-3 py-3 md:table-cell">
+                    <SignalBars value={c.relationship_strength} />
+                  </td>
+                  <td className="hidden px-3 py-3 text-slate-500 sm:table-cell">{formatDate(c.last_interaction_date)}</td>
+                  <td className="px-3 py-3">
+                    <div className="flex flex-wrap gap-1">
+                      {needs > 0 && <Chip tone="violet">{needs} need{needs > 1 && "s"}</Chip>}
+                      {offers > 0 && <Chip tone="sky">{offers} offer{offers > 1 && "s"}</Chip>}
+                      {needs + offers === 0 && <span className="text-slate-300">—</span>}
+                    </div>
+                  </td>
+                  <td className="hidden px-3 py-3 lg:table-cell">
+                    {!c.enrichment ? (
+                      <span className="text-slate-300">—</span>
+                    ) : c.enrichment.status === "matched" ? (
+                      <Chip tone="emerald">
+                        <Globe className="size-3" /> enriched
+                      </Chip>
+                    ) : (
+                      <Chip tone="slate">no match</Chip>
+                    )}
+                  </td>
+                  <td className="pr-4">
+                    <ChevronRight className="size-4 text-slate-300 transition group-hover:translate-x-0.5 group-hover:text-ink-500" />
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+        {contacts.length === 0 && (
+          <p className="px-5 py-12 text-center text-sm text-slate-500">No contacts yet. Add one, import a CSV, or load the demo.</p>
+        )}
+      </div>
     </div>
   );
+}
+
+function formatDate(d: string | null) {
+  if (!d) return "—";
+  return new Date(d + "T12:00:00").toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
 }

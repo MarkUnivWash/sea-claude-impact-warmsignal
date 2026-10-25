@@ -1,4 +1,4 @@
-import { db, must } from "./supabase";
+import { must, type Ctx } from "./supabase";
 import { ineligibleReason, scoreOpportunity, type ScoreBreakdown } from "./scoring";
 import type { Contact, Opportunity, Signal } from "./types";
 
@@ -33,12 +33,16 @@ export function defaultEvalDate(): string {
 
 type SignalWithDate = Signal & { interactions: { date: string } };
 
-export async function buildBriefing(evalDate: string): Promise<Briefing> {
-  const supabase = db();
+export async function buildBriefing(ctx: Ctx, evalDate: string): Promise<Briefing> {
+  const { db: supabase, ownerId } = ctx;
   const [opps, contacts, signals] = await Promise.all([
-    supabase.from("opportunities").select("*").then((r) => must<Opportunity[]>(r)),
-    supabase.from("contacts").select("*").then((r) => must<Contact[]>(r)),
-    supabase.from("signals").select("*, interactions(date)").then((r) => must<SignalWithDate[]>(r)),
+    supabase.from("opportunities").select("*").eq("owner_id", ownerId).then((r) => must<Opportunity[]>(r)),
+    supabase.from("contacts").select("*").eq("owner_id", ownerId).then((r) => must<Contact[]>(r)),
+    supabase
+      .from("signals")
+      .select("*, interactions(date)")
+      .eq("owner_id", ownerId)
+      .then((r) => must<SignalWithDate[]>(r)),
   ]);
 
   const contactById = new Map(contacts.map((c) => [c.id, c]));

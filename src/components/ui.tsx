@@ -1,0 +1,126 @@
+/** Shared visual primitives. No client state, so usable from server and client components. */
+
+export const btn = {
+  primary: "bg-ink-900 text-white shadow-sm hover:bg-ink-800",
+  secondary: "border border-slate-200 bg-white text-slate-700 shadow-sm hover:border-slate-300 hover:bg-slate-50",
+  ghost: "text-slate-500 hover:bg-slate-100 hover:text-slate-800",
+  success: "bg-emerald-600 text-white shadow-sm hover:bg-emerald-700",
+};
+
+export const input =
+  "w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-ink-500 focus:ring-4 focus:ring-ink-100";
+
+export const card = "rounded-2xl border border-slate-200/80 bg-white shadow-card";
+
+export function Logo({ size = 28 }: { size?: number }) {
+  return (
+    <svg width={size * 1.4} height={size} viewBox="0 0 42 30" aria-hidden>
+      <defs>
+        <linearGradient id="ws-a" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#c7d2fe" />
+          <stop offset="1" stopColor="#a5b4fc" />
+        </linearGradient>
+        <linearGradient id="ws-b" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stopColor="#818cf8" />
+          <stop offset="1" stopColor="#4f46e5" />
+        </linearGradient>
+      </defs>
+      <circle cx="13" cy="15" r="12" fill="url(#ws-a)" />
+      <circle cx="28" cy="15" r="12" fill="url(#ws-b)" fillOpacity="0.92" />
+    </svg>
+  );
+}
+
+const PALETTES = [
+  "from-indigo-400 to-violet-500",
+  "from-sky-400 to-indigo-500",
+  "from-violet-400 to-fuchsia-500",
+  "from-blue-400 to-cyan-500",
+  "from-purple-400 to-indigo-600",
+  "from-teal-400 to-sky-500",
+];
+
+export function Avatar({ name, size = "md" }: { name: string; size?: "sm" | "md" | "lg" | "xl" }) {
+  const initials = name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0]!.toUpperCase())
+    .join("");
+  const hash = [...name].reduce((h, ch) => (h * 31 + ch.charCodeAt(0)) >>> 0, 7);
+  const sizes = {
+    sm: "size-8 text-xs",
+    md: "size-10 text-sm",
+    lg: "size-16 text-xl",
+    xl: "size-20 text-2xl",
+  };
+  return (
+    <span
+      className={`inline-flex shrink-0 items-center justify-center rounded-full bg-gradient-to-br font-semibold text-white ring-4 ring-white shadow-sm ${PALETTES[hash % PALETTES.length]} ${sizes[size]}`}
+    >
+      {initials}
+    </span>
+  );
+}
+
+const TONES = {
+  violet: "bg-violet-50 text-violet-900 ring-violet-200/70",
+  sky: "bg-sky-50 text-sky-900 ring-sky-200/70",
+  slate: "bg-slate-100 text-slate-700 ring-slate-200",
+  amber: "bg-amber-50 text-amber-800 ring-amber-200/70",
+  emerald: "bg-emerald-50 text-emerald-800 ring-emerald-200/70",
+};
+
+export function Chip({
+  children,
+  tone = "slate",
+  className = "",
+}: {
+  children: React.ReactNode;
+  tone?: keyof typeof TONES;
+  className?: string;
+}) {
+  return (
+    <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset ${TONES[tone]} ${className}`}>
+      {children}
+    </span>
+  );
+}
+
+/** Relationship strength 1–5 as phone-style signal bars. */
+export function SignalBars({ value, max = 5 }: { value: number; max?: number }) {
+  return (
+    <span className="inline-flex items-end gap-[3px]" title={`Relationship ${value}/${max}`}>
+      {Array.from({ length: max }, (_, i) => (
+        <span
+          key={i}
+          className={`w-[4px] rounded-full ${i < value ? "bg-ink-500" : "bg-slate-200"}`}
+          style={{ height: 5 + i * 3 }}
+        />
+      ))}
+    </span>
+  );
+}
+
+export function PageHeader({
+  eyebrow,
+  title,
+  subtitle,
+  actions,
+}: {
+  eyebrow?: React.ReactNode;
+  title: React.ReactNode;
+  subtitle?: React.ReactNode;
+  actions?: React.ReactNode;
+}) {
+  return (
+    <header className="relative flex flex-wrap items-end justify-between gap-6">
+      <div className="min-w-0">
+        {eyebrow && <p className="text-sm font-medium text-slate-500">{eyebrow}</p>}
+        <h1 className="mt-1 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">{title}</h1>
+        {subtitle && <p className="mt-2 text-base text-slate-500">{subtitle}</p>}
+      </div>
+      {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
+    </header>
+  );
+}

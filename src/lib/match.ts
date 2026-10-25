@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { structuredCall } from "./claude";
-import { db, must } from "./supabase";
+import { must, type Ctx } from "./supabase";
 import { enrichmentLine } from "./enrich";
 import type { Contact, Signal } from "./types";
 
@@ -11,7 +11,7 @@ import type { Contact, Signal } from "./types";
 
 const MatchSchema = z.object({
   need_ref: z.string().describe("The N# reference of the need"),
-  proposed_contact_id: z.string().describe("contact id of the person Alonso would introduce"),
+  proposed_ref: z.string().describe("The P# reference of the person Alonso would introduce"),
   offer_ref: z.string().nullable().describe("The O# reference of the matching recorded offer, or null if the match is based only on their profile"),
   give_value: z.number().int().describe("0-5 rubric score"),
   match_basis: z.enum(["stated_offer", "profile_inference"]),
@@ -43,9 +43,9 @@ Rules:
 - "public web" lines are unverified context from web search. They can support why_now or a profile_inference, but never count as a stated need or stated offer.
 - Write tersely: Alonso reads each recommendation in under 30 seconds. Respect the word limits.`;
 
-function contactLine(c: Contact) {
+function contactLine(ref: string, c: Contact) {
   const pref = c.introduction_preferences ? ` | intro preferences: ${c.introduction_preferences}` : "";
-  return `${c.id}: ${c.name}, ${c.title ?? "?"} at ${c.company ?? "?"} (${c.industry ?? "?"}), relationship strength ${c.relationship_strength}/5${pref}`;
+  return `${ref}: ${c.name}, ${c.title ?? "?"} at ${c.company ?? "?"} (${c.industry ?? "?"}), relationship strength ${c.relationship_strength}/5${pref}`;
 }
 
 function signalLine(ref: string, s: Signal) {
@@ -55,29 +55,34 @@ function signalLine(ref: string, s: Signal) {
   return `${ref} [${s.category}] ${s.description} (${flags}) - evidence: "${s.supporting_text}"`;
 }
 
-export async function findIntroductions(): Promise<{ needs: number; matches: number }> {
-  const supabase = db();
-  const contacts = must<Contact[]>(await supabase.from("contacts").select("*").order("id"));
+export async function findIntroductions(ctx: Ctx): Promise<{ needs: number; matches: number }> {
+  const { db: supabase, ownerId } = ctx;
+  const contacts = must<Contact[]>(
+    await supabase.from("contacts").select("*").eq("owner_id", ownerId).order("created_at").order("id"),
+  );
   const signals = must<(Signal & { interactions: { date: string; context: { uncertainties?: string[] } | null } })[]>(
-    await supabase.from("signals").select("*, interactions(date, context)").eq("status", "active").order("created_at"),
+    await supabase.from("signals").select("*, interactions(date, context)").eq("owner_id", ownerId).eq("status", "active").order("created_at"),
   );
 
   const needs = signals.filter((s) => s.type === "need");
   const offers = signals.filter((s) => s.type === "offer");
   const contactById = new Map(contacts.map((c) => [c.id, c]));
+  // Short refs keep prompts compact and avoid asking the model to copy UUIDs.
+  const contactRef = new Map(contacts.map((c, i) => [`P${i + 1}`, c]));
+  const refByContact = new Map([...contactRef].map(([ref, c]) => [c.id, ref]));
 
   const needRef = new Map(needs.map((s, i) => [`N${i + 1}`, s]));
   const offerRef = new Map(offers.map((s, i) => [`O${i + 1}`, s]));
   const offerRefBySignal = new Map([...offerRef].map(([ref, s]) => [s.id, ref]));
 
   // Directory: every contact with their recorded offers and sensitivities.
-  const directory = contacts
-    .map((c) => {
+  const directory = [...contactRef]
+    .map(([ref, c]) => {
       const theirOffers = offers.filter((o) => o.contact_id === c.id);
       const sensitivities = signals
         .filter((s) => s.contact_id === c.id)
         .flatMap((s) => s.interactions?.context?.uncertainties ?? []);
-      const lines = [contactLine(c)];
+      const lines = [contactLine(ref, c)];
       for (const o of theirOffers) lines.push(`  offer ${signalLine(offerRefBySignal.get(o.id)!, o)}`);
       for (const u of new Set(sensitivities)) lines.push(`  note: ${u}`);
       const web = enrichmentLine(c.enrichment);
@@ -102,7 +107,7 @@ Find introductions for these needs:
 ${batch
   .map(([ref, s]) => {
     const c = contactById.get(s.contact_id)!;
-    return `RECIPIENT ${c.id} (${c.name}), noted ${s.interactions.date}: ${signalLine(ref, s)}`;
+    return `RECIPIENT ${refByContact.get(c.id)} (${c.name}), noted ${s.interactions.date}: ${signalLine(ref, s)}`;
   })
   .join("\n")}`,
         schema: MatchResultSchema,
@@ -115,11 +120,12 @@ ${batch
     .flatMap((r) => r.matches)
     .flatMap((m) => {
       const need = needRef.get(m.need_ref);
-      const proposed = contactById.get(m.proposed_contact_id);
+      const proposed = contactRef.get(m.proposed_ref);
       if (!need || !proposed || proposed.id === need.contact_id) return [];
       const offer = m.offer_ref ? offerRef.get(m.offer_ref) : undefined;
       return [
         {
+          owner_id: ownerId,
           recipient_contact_id: need.contact_id,
           proposed_contact_id: proposed.id,
           matched_need_id: need.id,

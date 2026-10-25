@@ -1,5 +1,6 @@
 export type Contact = {
   id: string;
+  external_id: string | null;
   name: string;
   company: string | null;
   title: string | null;

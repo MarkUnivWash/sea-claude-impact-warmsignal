@@ -3,38 +3,109 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { after } from "next/server";
+import { requireCtx, userDb } from "@/lib/auth";
 import { defaultEvalDate } from "@/lib/briefing";
 import { importContactsCsv } from "@/lib/contacts";
+import { loadDemoData, removeDemoData } from "@/lib/demo";
 import { ensureDrafts } from "@/lib/draft";
 import { enrichAndSave, enrichPending } from "@/lib/enrich";
 import { ingestNote } from "@/lib/extract";
 import { findIntroductions } from "@/lib/match";
-import { db, must } from "@/lib/supabase";
+import { must, serviceCtx, serviceDb } from "@/lib/supabase";
 import type { Opportunity } from "@/lib/types";
 
-// No auth in the MVP (PRD §6.4). The deployed site is gated by APP_PASSWORD (see src/proxy.ts).
+// Every action resolves the signed-in user first (requireCtx redirects to /login otherwise),
+// and all reads/writes go through their RLS-scoped client. Background work after the
+// response uses the service client with an explicit owner id.
 
 const evalDateFrom = (formData: FormData) => String(formData.get("eval_date") || defaultEvalDate());
 
 async function updateOpportunity(id: string, patch: Partial<Opportunity>) {
-  must(await db().from("opportunities").update({ ...patch, updated_at: new Date().toISOString() }).eq("id", id));
+  const ctx = await requireCtx();
+  must(
+    await ctx.db
+      .from("opportunities")
+      .update({ ...patch, updated_at: new Date().toISOString() })
+      .eq("owner_id", ctx.ownerId)
+      .eq("id", id),
+  );
 }
 
+// ---------- Auth ----------
+
+/** Email/invite are echoed back so the form keeps them after an error (React resets forms on submit). */
+export type AuthState = { error: string | null; email?: string; invite?: string };
+
+export async function signUpAction(_prev: AuthState, formData: FormData): Promise<AuthState> {
+  const email = String(formData.get("email") ?? "").trim().toLowerCase();
+  const password = String(formData.get("password") ?? "");
+  const invite = String(formData.get("invite_code") ?? "").trim();
+
+  const fail = (error: string): AuthState => ({ error, email, invite });
+
+  const expected = process.env.INVITE_CODE;
+  if (!expected) return fail("Sign-up is closed (no INVITE_CODE configured)");
+  if (invite !== expected) return fail("That invite code isn't valid");
+  if (!email.includes("@")) return fail("Enter a valid email");
+  if (password.length < 8) return fail("Password must be at least 8 characters");
+
+  // Public sign-up is disabled in Supabase; accounts are only created here, after the invite check.
+  const { error } = await serviceDb().auth.admin.createUser({ email, password, email_confirm: true });
+  if (error) {
+    return fail(/already|registered|exists/i.test(error.message) ? "An account with that email already exists" : error.message);
+  }
+  const signIn = await (await userDb()).auth.signInWithPassword({ email, password });
+  if (signIn.error) return fail(signIn.error.message);
+  redirect("/");
+}
+
+export async function signInAction(_prev: AuthState, formData: FormData): Promise<AuthState> {
+  const email = String(formData.get("email") ?? "").trim().toLowerCase();
+  const { error } = await (await userDb()).auth.signInWithPassword({
+    email,
+    password: String(formData.get("password") ?? ""),
+  });
+  if (error) return { error: "Wrong email or password", email };
+  redirect("/");
+}
+
+export async function signOutAction() {
+  await (await userDb()).auth.signOut();
+  redirect("/login");
+}
+
+// ---------- Demo data ----------
+
+export async function loadDemoAction() {
+  await loadDemoData(await requireCtx());
+  revalidatePath("/", "layout");
+}
+
+export async function removeDemoAction() {
+  await removeDemoData(await requireCtx());
+  revalidatePath("/", "layout");
+}
+
+// ---------- Contacts & notes ----------
+
 export async function addNoteAction(formData: FormData) {
+  const ctx = await requireCtx();
   const contactId = String(formData.get("contact_id"));
   const date = String(formData.get("date") || defaultEvalDate());
   const notes = String(formData.get("notes") ?? "").trim();
   if (!notes) throw new Error("Note is empty");
-  await ingestNote(contactId, date, notes);
+  await ingestNote(ctx, contactId, date, notes);
   revalidatePath(`/contacts/${contactId}`);
 }
 
 export async function importCsvAction(formData: FormData) {
+  const ctx = await requireCtx();
   const file = formData.get("file");
   if (!(file instanceof File) || file.size === 0) throw new Error("Choose a CSV file");
-  await importContactsCsv(await file.text());
+  await importContactsCsv(ctx, await file.text());
   // Enrich new contacts from the web in the background, after the response is sent.
-  after(() => enrichPending());
+  const bg = serviceCtx(ctx.ownerId);
+  after(() => enrichPending(bg));
   revalidatePath("/contacts");
 }
 
@@ -42,17 +113,17 @@ export type CreateContactState = { error: string | null };
 
 /** Manual contact entry (modal). Optionally logs a first conversation, then enriches in the background. */
 export async function createContactAction(_prev: CreateContactState, formData: FormData): Promise<CreateContactState> {
+  const ctx = await requireCtx();
   const text = (key: string) => String(formData.get(key) ?? "").trim() || null;
   const name = text("name");
   if (!name) return { error: "Name is required" };
   if (formData.get("consent") !== "on") return { error: "Confirm this person is OK being added" };
 
-  const id = `c-${Date.now().toString(36)}`;
   const strength = Number(formData.get("relationship_strength"));
-  const { error } = await db()
+  const { data, error } = await ctx.db
     .from("contacts")
     .insert({
-      id,
+      owner_id: ctx.ownerId,
       name,
       company: text("company"),
       title: text("title"),
@@ -60,36 +131,44 @@ export async function createContactAction(_prev: CreateContactState, formData: F
       relationship_strength: strength >= 1 && strength <= 5 ? strength : 3,
       last_interaction_date: text("last_interaction_date"),
       introduction_preferences: text("introduction_preferences"),
-    });
-  if (error) return { error: error.message };
+    })
+    .select("id")
+    .single<{ id: string }>();
+  if (error || !data) return { error: error?.message ?? "Couldn't save the contact" };
+  const id = data.id;
 
   const notes = text("notes");
   if (notes) {
     try {
-      await ingestNote(id, text("last_interaction_date") ?? defaultEvalDate(), notes);
+      await ingestNote(ctx, id, text("last_interaction_date") ?? defaultEvalDate(), notes);
     } catch (e) {
       return { error: `Contact saved, but note extraction failed: ${(e as Error).message}` };
     }
   }
-  after(() => enrichAndSave(id).catch((e) => console.error(`Enrichment failed for ${id}:`, e)));
+  const bg = serviceCtx(ctx.ownerId);
+  after(() => enrichAndSave(bg, id).catch((e) => console.error(`Enrichment failed for ${id}:`, e)));
   revalidatePath("/contacts");
   redirect(`/contacts/${id}`);
 }
 
 export async function enrichContactAction(formData: FormData) {
+  const ctx = await requireCtx();
   const id = String(formData.get("contact_id"));
-  await enrichAndSave(id);
+  await enrichAndSave(ctx, id);
   revalidatePath(`/contacts/${id}`);
 }
 
 export async function enrichAllAction() {
-  await enrichPending();
+  await enrichPending(await requireCtx());
   revalidatePath("/contacts");
 }
 
+// ---------- Briefing ----------
+
 export async function findIntroductionsAction(formData: FormData) {
-  await findIntroductions();
-  await ensureDrafts(evalDateFrom(formData));
+  const ctx = await requireCtx();
+  await findIntroductions(ctx);
+  await ensureDrafts(ctx, evalDateFrom(formData));
   revalidatePath("/");
 }
 

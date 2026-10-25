@@ -14,14 +14,20 @@ Contacts CSV + notes → Claude extraction (needs/offers + quotes) → Supabase
 
 ```bash
 npm install
-cp .env.example .env.local      # fill in ANTHROPIC_API_KEY, SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
-# Apply the schema: paste supabase/migrations/*.sql into the Supabase SQL editor,
-# or: supabase link --project-ref <ref> && supabase db push
-npm run seed                    # 30 sample contacts, 14 notes, extraction + matching (~1–2 min)
-npm run dev                     # http://localhost:3000
+cp .env.example .env.local      # Anthropic, Supabase (URL, anon, service role), Tavily, INVITE_CODE
+# Apply the schema: supabase link --project-ref <ref> && supabase db push
+npm run dev                     # http://localhost:3000 -> /signup with the invite code
 ```
 
-`npm run seed -- --reset` wipes everything and reloads the sample data.
+**Accounts.** Email/password sign-up is gated by `INVITE_CODE` (checked server-side; the account is created with the admin API). Turn off **Allow new users to sign up** in Supabase → Authentication so the invite gate can't be bypassed. Each account has its own private network, enforced by Postgres RLS on `owner_id`.
+
+**Demo data.** A new account starts empty. **Load demo contacts** (on the briefing page or the Contacts page) copies `data/demo_snapshot.json` into the account instantly: 30 fictional contacts with processed notes, intros and drafts, plus 5 real public figures who are web-enriched only and never introduced. **Remove demo contacts** deletes them again.
+
+To regenerate the snapshot with the live pipeline (Claude extraction, Tavily enrichment, matching, drafts; about 2 minutes):
+
+```bash
+npm run seed -- --email you@example.com --reset --export
+```
 
 ## Where things live
 
@@ -41,7 +47,7 @@ npm run dev                     # http://localhost:3000
 - **Eligibility comes before ranking.** Give Value must be at least 3/5. Candidates are also dropped if they're flagged inappropriate, the need is expired or stale (>270 days), the need is an inference backed by weak evidence, or the candidate was dismissed, deferred, or handled. Filtered candidates appear on the briefing page with the reason, so you can show FR-07 working.
 - **Facts vs. assumptions.** Each need or offer carries a verbatim quote, an `is_inferred` flag, and `quote_verified` (we check that the quote really appears in the note). Inferred needs have their Match Confidence capped.
 - **Consent first.** The suggested action always asks the recipient first, then the proposed contact. Nothing is ever sent automatically.
-- **Privacy.** Supabase RLS is on with no policies, and the server uses the service-role key. Set `APP_PASSWORD` on Vercel to put the deployed site behind HTTP Basic auth.
+- **Privacy.** Each user's rows are protected by RLS (`owner_id = auth.uid()`), and requests use the user's session. The service-role key is used only for scripts, background enrichment and creating accounts. Only name, title and company are sent to Tavily.
 
 ## Expected demo outcomes (sample data, eval date 2026-10-25)
 

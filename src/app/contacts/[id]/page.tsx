@@ -1,9 +1,26 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import {
+  ArrowLeft,
+  BadgeCheck,
+  Building2,
+  CalendarDays,
+  Clock,
+  ExternalLink,
+  Globe,
+  HandHeart,
+  Hand,
+  MessageSquareText,
+  RefreshCw,
+  ShieldAlert,
+  Sparkles,
+} from "lucide-react";
 import { addNoteAction, enrichContactAction } from "@/app/actions";
 import { SubmitButton } from "@/components/submit-button";
+import { Avatar, btn, card, Chip, input, SignalBars } from "@/components/ui";
 import { defaultEvalDate } from "@/lib/briefing";
-import { db, must } from "@/lib/supabase";
+import { requireCtx } from "@/lib/auth";
+import { must } from "@/lib/supabase";
 import type { Contact, Enrichment, Interaction, Signal } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
@@ -11,120 +28,163 @@ export const maxDuration = 300;
 
 export default async function ContactPage({ params }: PageProps<"/contacts/[id]">) {
   const { id } = await params;
-  const supabase = db();
-  const { data: contact } = await supabase.from("contacts").select("*").eq("id", id).maybeSingle<Contact>();
+  const ctx = await requireCtx();
+  const supabase = ctx.db;
+  const { data: contact } = await supabase
+    .from("contacts")
+    .select("*")
+    .eq("owner_id", ctx.ownerId)
+    .eq("id", id)
+    .maybeSingle<Contact>();
   if (!contact) notFound();
 
   const [interactions, signals] = await Promise.all([
     supabase
       .from("interactions")
       .select("*")
+      .eq("owner_id", ctx.ownerId)
       .eq("contact_id", id)
       .order("date", { ascending: false })
       .then((r) => must<Interaction[]>(r)),
-    supabase.from("signals").select("*").eq("contact_id", id).then((r) => must<Signal[]>(r)),
+    supabase
+      .from("signals")
+      .select("*")
+      .eq("owner_id", ctx.ownerId)
+      .eq("contact_id", id)
+      .then((r) => must<Signal[]>(r)),
   ]);
 
   return (
-    <div className="space-y-8">
-      <div>
-        <Link href="/contacts" className="text-sm text-stone-500 hover:underline">
-          ← Contacts
-        </Link>
-        <h1 className="font-serif text-3xl font-semibold">{contact.name}</h1>
-        <p className="text-stone-600">
-          {[
-            [contact.title, contact.company].filter(Boolean).join(", "),
-            contact.industry,
-            `relationship ${contact.relationship_strength}/5`,
-            `last interaction ${contact.last_interaction_date ?? "unknown"}`,
-          ]
-            .filter(Boolean)
-            .join(" · ")}
-        </p>
-        {contact.introduction_preferences && (
-          <p className="mt-2 rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-900">
-            Intro preferences: {contact.introduction_preferences}
-          </p>
-        )}
-      </div>
+    <div className="space-y-6">
+      <Link href="/contacts" className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-500 hover:text-slate-900">
+        <ArrowLeft className="size-4" /> Contacts
+      </Link>
 
-      <WebProfile contact={contact} />
-
-      <form action={addNoteAction} className="space-y-3 rounded-xl border border-stone-200 bg-white p-5">
-        <h2 className="font-serif text-lg font-semibold">Log a conversation</h2>
-        <input type="hidden" name="contact_id" value={contact.id} />
-        <textarea
-          name="notes"
-          required
-          rows={5}
-          placeholder={`What did you learn from ${contact.name.split(" ")[0]}? Goals, challenges, what they're looking for, what they could offer others…`}
-          className="w-full rounded-md border border-stone-300 p-3 text-sm"
-        />
-        <div className="flex items-center gap-3">
-          <input
-            type="date"
-            name="date"
-            defaultValue={defaultEvalDate()}
-            className="rounded-md border border-stone-300 px-2 py-1 text-sm"
-          />
-          <SubmitButton pendingText="Extracting with Claude…" className="bg-amber-600 text-white hover:bg-amber-700">
-            Save &amp; extract
-          </SubmitButton>
+      <section className={`${card} flex flex-wrap items-center gap-6 p-6`}>
+        <Avatar name={contact.name} size="xl" />
+        <div className="min-w-0 flex-1 space-y-2">
+          <h1 className="text-3xl font-bold tracking-tight text-slate-950">{contact.name}</h1>
+          <p className="text-slate-500">{[contact.title, contact.company].filter(Boolean).join(", ")}</p>
+          <div className="flex flex-wrap items-center gap-2 text-sm text-slate-600">
+            {contact.industry && (
+              <Chip tone="slate">
+                <Building2 className="size-3" /> {contact.industry}
+              </Chip>
+            )}
+            <Chip tone="slate">
+              <SignalBars value={contact.relationship_strength} /> Relationship {contact.relationship_strength}/5
+            </Chip>
+            <Chip tone="slate">
+              <Clock className="size-3" /> Last spoke {contact.last_interaction_date ?? "unknown"}
+            </Chip>
+          </div>
         </div>
-      </form>
-
-      <section className="space-y-4">
-        <h2 className="font-serif text-xl font-semibold">Conversations</h2>
-        {interactions.length === 0 && <p className="text-sm text-stone-500">No conversations logged yet.</p>}
-        {interactions.map((it) => {
-          const mine = signals.filter((s) => s.interaction_id === it.id);
-          return (
-            <article key={it.id} className="rounded-xl border border-stone-200 bg-white p-5 text-sm">
-              <div className="text-xs font-medium uppercase tracking-wide text-stone-500">{it.date}</div>
-              <p className="mt-2 whitespace-pre-wrap text-stone-800">{it.raw_notes}</p>
-              {it.context?.summary && <p className="mt-3 italic text-stone-600">{it.context.summary}</p>}
-              <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                <SignalList title="Needs" items={mine.filter((s) => s.type === "need")} />
-                <SignalList title="Offers" items={mine.filter((s) => s.type === "offer")} />
-              </div>
-              {!!it.context?.uncertainties?.length && (
-                <div className="mt-4">
-                  <h3 className="text-xs font-semibold uppercase tracking-wide text-stone-500">Uncertain / sensitive</h3>
-                  <ul className="mt-1 list-disc pl-5 text-stone-600">
-                    {it.context.uncertainties.map((u) => (
-                      <li key={u}>{u}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </article>
-          );
-        })}
+        {contact.introduction_preferences && (
+          <div className="flex w-full items-start gap-2.5 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-900 ring-1 ring-inset ring-amber-200/70">
+            <ShieldAlert className="mt-0.5 size-4 shrink-0 text-amber-600" />
+            <span>
+              <span className="font-semibold">Intro preferences:</span> {contact.introduction_preferences}
+            </span>
+          </div>
+        )}
       </section>
+
+      <div className="grid items-start gap-6 lg:grid-cols-[1fr_340px]">
+        <div className="space-y-6">
+          <form action={addNoteAction} className={`${card} space-y-3 p-6`}>
+            <h2 className="flex items-center gap-2 text-lg font-bold tracking-tight">
+              <MessageSquareText className="size-5 text-ink-500" /> Log a conversation
+            </h2>
+            <input type="hidden" name="contact_id" value={contact.id} />
+            <textarea
+              name="notes"
+              required
+              rows={5}
+              placeholder={`What did you learn from ${contact.name.split(" ")[0]}? Goals, challenges, what they're looking for, what they could offer others…`}
+              className={`${input} leading-relaxed`}
+            />
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <input type="date" name="date" defaultValue={defaultEvalDate()} className={`${input} !w-auto`} />
+              <SubmitButton pendingText="Extracting with Claude…" className={btn.primary}>
+                <Sparkles className="size-4" /> Save &amp; extract
+              </SubmitButton>
+            </div>
+          </form>
+
+          <section className="space-y-4">
+            <h2 className="text-lg font-bold tracking-tight">
+              Conversations <span className="font-medium text-slate-400">{interactions.length}</span>
+            </h2>
+            {interactions.length === 0 && (
+              <p className={`${card} px-6 py-10 text-center text-sm text-slate-500`}>No conversations logged yet.</p>
+            )}
+            <ol className="relative space-y-4 before:absolute before:bottom-4 before:left-[19px] before:top-4 before:w-px before:bg-slate-200">
+              {interactions.map((it) => {
+                const mine = signals.filter((s) => s.interaction_id === it.id);
+                return (
+                  <li key={it.id} className="relative flex gap-4">
+                    <span className="z-0 mt-5 flex size-10 shrink-0 items-center justify-center rounded-full bg-white text-ink-500 shadow-sm ring-1 ring-slate-200">
+                      <CalendarDays className="size-4" />
+                    </span>
+                    <article className={`${card} min-w-0 flex-1 p-5 text-sm`}>
+                      <div className="text-xs font-semibold uppercase tracking-wider text-slate-400">{it.date}</div>
+                      <p className="mt-2 whitespace-pre-wrap leading-relaxed text-slate-700">{it.raw_notes}</p>
+                      {it.context?.summary && (
+                        <p className="mt-3 rounded-lg bg-ink-50/60 px-3 py-2 text-ink-900">
+                          <Sparkles className="mr-1.5 inline size-3.5 text-ink-500" />
+                          {it.context.summary}
+                        </p>
+                      )}
+                      <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                        <SignalList title="Needs" tone="violet" items={mine.filter((s) => s.type === "need")} />
+                        <SignalList title="Offers" tone="sky" items={mine.filter((s) => s.type === "offer")} />
+                      </div>
+                      {!!it.context?.uncertainties?.length && (
+                        <div className="mt-4">
+                          <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400">Uncertain / sensitive</h3>
+                          <ul className="mt-1 list-disc pl-5 text-slate-600">
+                            {it.context.uncertainties.map((u) => (
+                              <li key={u}>{u}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </article>
+                  </li>
+                );
+              })}
+            </ol>
+          </section>
+        </div>
+
+        <WebProfile contact={contact} />
+      </div>
     </div>
   );
 }
 
-function SignalList({ title, items }: { title: string; items: Signal[] }) {
+function SignalList({ title, tone, items }: { title: string; tone: "violet" | "sky"; items: Signal[] }) {
+  const Icon = tone === "violet" ? Hand : HandHeart;
   return (
     <div>
-      <h3 className="text-xs font-semibold uppercase tracking-wide text-stone-500">{title}</h3>
-      {items.length === 0 && <p className="mt-1 text-stone-400">None stated</p>}
-      <ul className="mt-1 space-y-2">
+      <h3 className={`flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider ${tone === "violet" ? "text-violet-600" : "text-sky-600"}`}>
+        <Icon className="size-3.5" /> {title}
+      </h3>
+      {items.length === 0 && <p className="mt-2 text-slate-400">None stated</p>}
+      <ul className="mt-2 space-y-2">
         {items.map((s) => (
-          <li key={s.id} className="rounded-md bg-stone-50 p-2">
-            <div className="font-medium">
-              {s.description}{" "}
-              <span className="text-xs font-normal text-stone-500">
-                [{s.category}] {Math.round(s.confidence * 100)}%
-              </span>
+          <li key={s.id} className={`rounded-xl p-3 ring-1 ring-inset ${tone === "violet" ? "bg-violet-50/50 ring-violet-100" : "bg-sky-50/50 ring-sky-100"}`}>
+            <div className="flex items-start justify-between gap-2">
+              <span className="font-medium text-slate-900">{s.description}</span>
+              <span className="shrink-0 font-mono text-xs text-slate-400">{Math.round(s.confidence * 100)}%</span>
             </div>
-            <div className="text-xs text-stone-500">
-              “{s.supporting_text}”{s.is_inferred && <span className="ml-1 text-amber-700">· inferred</span>}
-              {!s.quote_verified && <span className="ml-1 text-amber-700">· not verbatim</span>}
-              {s.time_sensitive && <span className="ml-1">· time-sensitive</span>}
-              {s.relevant_until && <span className="ml-1">· until {s.relevant_until}</span>}
+            <div className="mt-1 text-xs leading-relaxed text-slate-500">“{s.supporting_text}”</div>
+            <div className="mt-2 flex flex-wrap gap-1">
+              <Chip tone="slate">{s.category}</Chip>
+              {s.is_inferred && <Chip tone="amber">inferred</Chip>}
+              {!s.quote_verified && <Chip tone="amber">not verbatim</Chip>}
+              {s.time_sensitive && <Chip tone="slate">time-sensitive</Chip>}
+              {s.relevant_until && <Chip tone="slate">until {s.relevant_until}</Chip>}
             </div>
           </li>
         ))}
@@ -136,48 +196,69 @@ function SignalList({ title, items }: { title: string; items: Signal[] }) {
 function WebProfile({ contact }: { contact: Contact }) {
   const e: Enrichment | null = contact.enrichment;
   return (
-    <section className="rounded-xl border border-stone-200 bg-white p-5 text-sm">
-      <div className="flex items-center justify-between">
-        <h2 className="font-serif text-lg font-semibold">
-          Public web profile <span className="text-xs font-normal text-stone-500">via Tavily · unverified</span>
-        </h2>
+    <section className={`${card} p-5 text-sm lg:sticky lg:top-6`}>
+      <div className="flex items-start justify-between gap-2">
+        <div>
+          <h2 className="flex items-center gap-2 font-bold tracking-tight">
+            <Globe className="size-4 text-ink-500" /> Public web profile
+          </h2>
+          <p className="text-xs text-slate-400">via Tavily · unverified</p>
+        </div>
         <form action={enrichContactAction}>
           <input type="hidden" name="contact_id" value={contact.id} />
-          <SubmitButton pendingText="Searching the web…" className="border border-stone-300 hover:bg-stone-100">
-            {contact.enriched_at ? "Refresh" : "Enrich"}
+          <SubmitButton pendingText="Searching…" className={`${btn.secondary} !px-2.5 !py-1.5 text-xs`}>
+            <RefreshCw className="size-3.5" /> {contact.enriched_at ? "Refresh" : "Enrich"}
           </SubmitButton>
         </form>
       </div>
       {!e && (
-        <p className="mt-2 text-stone-500">
+        <p className="mt-4 text-slate-500">
           Not enriched yet. New contacts are enriched in the background, so refresh in a few seconds.
         </p>
       )}
       {e?.status === "no_confident_match" && (
-        <p className="mt-2 text-stone-500">No confident match found online. {e.identity_notes}</p>
+        <p className="mt-4 text-slate-500">No confident match found online. {e.identity_notes}</p>
       )}
       {e?.status === "matched" && (
-        <div className="mt-2 space-y-3">
-          <p>
-            {e.summary} <span className="text-xs text-stone-500">({e.identity_confidence} confidence: {e.identity_notes})</span>
+        <div className="mt-4 space-y-4">
+          <p className="leading-relaxed text-slate-700">{e.summary}</p>
+          <p className="flex items-start gap-1.5 text-xs text-slate-500">
+            <BadgeCheck className="mt-px size-3.5 shrink-0 text-emerald-500" />
+            {e.identity_confidence} confidence: {e.identity_notes}
           </p>
           {e.recent_signals.length > 0 && (
-            <ul className="space-y-1">
+            <ul className="space-y-2 border-t border-slate-100 pt-4">
               {e.recent_signals.map((x) => (
-                <li key={x.source_url + x.text}>
-                  <span className="rounded bg-sky-100 px-1.5 py-0.5 text-xs text-sky-800">{x.kind.replace("_", " ")}</span>{" "}
-                  {x.text} {x.date && <span className="text-stone-500">({x.date})</span>}{" "}
-                  <a href={x.source_url} target="_blank" rel="noreferrer" className="text-xs text-amber-700 hover:underline">
-                    source
-                  </a>
+                <li key={x.source_url + x.text} className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <Chip tone="sky">{x.kind.replace("_", " ")}</Chip>
+                    {x.date && <span className="text-xs text-slate-400">{x.date}</span>}
+                    <a
+                      href={x.source_url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="ml-auto text-slate-400 hover:text-ink-600"
+                      title="Source"
+                    >
+                      <ExternalLink className="size-3.5" />
+                    </a>
+                  </div>
+                  <p className="text-slate-700">{x.text}</p>
                 </li>
               ))}
             </ul>
           )}
           {e.possible_offers.length > 0 && (
-            <p className="text-stone-600">
-              <span className="font-medium">Could offer:</span> {e.possible_offers.map((o) => o.text).join("; ")}
-            </p>
+            <div className="border-t border-slate-100 pt-4">
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-400">Could offer</h3>
+              <ul className="mt-2 space-y-1 text-slate-700">
+                {e.possible_offers.map((o) => (
+                  <li key={o.text} className="flex gap-2">
+                    <HandHeart className="mt-0.5 size-3.5 shrink-0 text-sky-500" /> {o.text}
+                  </li>
+                ))}
+              </ul>
+            </div>
           )}
         </div>
       )}

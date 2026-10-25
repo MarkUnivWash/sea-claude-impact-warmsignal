@@ -1,5 +1,6 @@
 "use client";
 
+import { Check, Copy, Mail } from "lucide-react";
 import { useState } from "react";
 
 /** Editable draft with a copy button. Edits stay local; Alonso sends from his own inbox. */
@@ -7,9 +8,11 @@ export function DraftBox({ draft, label }: { draft: string; label: string }) {
   const [text, setText] = useState(draft);
   const [copied, setCopied] = useState(false);
   return (
-    <div className="rounded-lg border border-amber-200 bg-amber-50/50">
-      <div className="flex items-center justify-between px-3 pt-2 text-xs font-medium text-amber-900">
-        <span>{label}</span>
+    <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition focus-within:border-ink-200 focus-within:ring-4 focus-within:ring-ink-50">
+      <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50/70 px-4 py-2 text-xs font-medium text-slate-600">
+        <span className="flex items-center gap-1.5">
+          <Mail className="size-3.5 text-slate-400" /> {label}
+        </span>
         <button
           type="button"
           onClick={async () => {
@@ -17,16 +20,19 @@ export function DraftBox({ draft, label }: { draft: string; label: string }) {
             setCopied(true);
             setTimeout(() => setCopied(false), 1500);
           }}
-          className="rounded bg-amber-600 px-2.5 py-1 text-white hover:bg-amber-700"
+          className={`inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 font-medium transition ${
+            copied ? "bg-emerald-50 text-emerald-700" : "text-ink-700 hover:bg-ink-50"
+          }`}
         >
-          {copied ? "Copied ✓" : "Copy message"}
+          {copied ? <Check className="size-3.5" /> : <Copy className="size-3.5" />}
+          {copied ? "Copied" : "Copy"}
         </button>
       </div>
       <textarea
         value={text}
         onChange={(e) => setText(e.target.value)}
         rows={Math.min(10, Math.max(4, Math.ceil(text.length / 85)))}
-        className="w-full resize-y bg-transparent px-3 py-2 text-sm leading-relaxed text-stone-800 outline-none"
+        className="block w-full resize-y bg-transparent px-4 py-3 text-sm leading-relaxed text-slate-700 outline-none"
       />
     </div>
   );

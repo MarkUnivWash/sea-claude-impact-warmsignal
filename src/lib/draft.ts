@@ -1,6 +1,6 @@
 import { textCall } from "./claude";
 import { buildBriefing, type Candidate } from "./briefing";
-import { db, must } from "./supabase";
+import { must, type Ctx } from "./supabase";
 import type { DraftKind } from "./types";
 
 // FR-08: drafts Alonso can edit and send himself. One per step of a double opt-in:
@@ -45,16 +45,22 @@ export async function draftOutreach(c: Candidate, kind: DraftKind = draftKindFor
 }
 
 /** Returns the stored draft for the card's current step, generating and saving it if missing. */
-export async function getOrCreateDraft(c: Candidate): Promise<string> {
+export async function getOrCreateDraft(ctx: Ctx, c: Candidate): Promise<string> {
   const kind = draftKindFor(c);
   if (c.opp.draft_message && c.opp.draft_kind === kind) return c.opp.draft_message;
   const draft_message = await draftOutreach(c, kind);
-  must(await db().from("opportunities").update({ draft_message, draft_kind: kind }).eq("id", c.opp.id));
+  must(
+    await ctx.db
+      .from("opportunities")
+      .update({ draft_message, draft_kind: kind })
+      .eq("owner_id", ctx.ownerId)
+      .eq("id", c.opp.id),
+  );
   return draft_message;
 }
 
 /** Pre-generates drafts for today's recommendations so the briefing opens instantly. */
-export async function ensureDrafts(evalDate: string): Promise<void> {
-  const { recommendations } = await buildBriefing(evalDate);
-  await Promise.all(recommendations.map(getOrCreateDraft));
+export async function ensureDrafts(ctx: Ctx, evalDate: string): Promise<void> {
+  const { recommendations } = await buildBriefing(ctx, evalDate);
+  await Promise.all(recommendations.map((c) => getOrCreateDraft(ctx, c)));
 }
