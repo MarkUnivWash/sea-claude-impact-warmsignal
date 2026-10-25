@@ -7,7 +7,24 @@ export type Contact = {
   relationship_strength: number;
   last_interaction_date: string | null;
   introduction_preferences: string | null;
+  enrichment: Enrichment | null;
+  enriched_at: string | null;
 };
+
+export type SourcedItem = { text: string; source_url: string; date: string | null };
+
+/** Public-web context from Tavily + Claude. Unverified; never a stated need. */
+export type Enrichment =
+  | { status: "no_confident_match"; identity_notes: string }
+  | {
+      status: "matched";
+      identity_confidence: "high" | "medium";
+      identity_notes: string;
+      summary: string;
+      recent_signals: (SourcedItem & { kind: string })[];
+      possible_offers: SourcedItem[];
+      sources: { title: string; url: string }[];
+    };
 
 export type Interaction = {
   id: string;
@@ -56,4 +73,7 @@ export type Opportunity = {
   status: OpportunityStatus;
   deferred_until: string | null;
   draft_message: string | null;
+  draft_kind: DraftKind | null;
 };
+
+export type DraftKind = "ask_recipient" | "ask_proposed" | "intro";

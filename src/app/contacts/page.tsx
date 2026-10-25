@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { importCsvAction } from "@/app/actions";
+import { enrichAllAction, importCsvAction } from "@/app/actions";
 import { SubmitButton } from "@/components/submit-button";
 import { db, must } from "@/lib/supabase";
 import type { Contact } from "@/lib/types";
@@ -22,6 +22,11 @@ export default async function ContactsPage() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <h1 className="font-serif text-3xl font-semibold">Contacts ({contacts.length})</h1>
+        <form action={enrichAllAction}>
+          <SubmitButton pendingText="Enriching…" className="border border-stone-300 bg-white text-sm hover:bg-stone-100">
+            Enrich new contacts
+          </SubmitButton>
+        </form>
         <form action={importCsvAction} className="flex items-center gap-2 text-sm">
           <input type="file" name="file" accept=".csv,text/csv" className="text-sm" />
           <SubmitButton className="border border-stone-300 bg-white hover:bg-stone-100">Import CSV</SubmitButton>
@@ -29,7 +34,8 @@ export default async function ContactsPage() {
       </div>
       <p className="text-sm text-stone-500">
         CSV columns: contact_id, name, company, title, industry, relationship_strength (1–5), last_interaction_date
-        (YYYY-MM-DD), introduction_preferences. Re-importing updates existing contacts by contact_id.
+        (YYYY-MM-DD), introduction_preferences. Re-importing updates existing contacts by contact_id. New contacts are
+        enriched from the public web automatically (Tavily); only name, title and company are searched.
       </p>
       <table className="w-full overflow-hidden rounded-lg border border-stone-200 bg-white text-sm">
         <thead className="bg-stone-100 text-left text-stone-600">
@@ -39,6 +45,7 @@ export default async function ContactsPage() {
             <th className="px-3 py-2">Strength</th>
             <th className="px-3 py-2">Last interaction</th>
             <th className="px-3 py-2">Needs / Offers</th>
+            <th className="px-3 py-2">Web</th>
           </tr>
         </thead>
         <tbody>
@@ -56,6 +63,9 @@ export default async function ContactsPage() {
               <td className="px-3 py-2 text-stone-600">{c.last_interaction_date ?? "—"}</td>
               <td className="px-3 py-2 text-stone-600">
                 {counts(c.id, "need")} / {counts(c.id, "offer")}
+              </td>
+              <td className="px-3 py-2 text-xs text-stone-500">
+                {!c.enrichment ? "—" : c.enrichment.status === "matched" ? "✓ enriched" : "no match"}
               </td>
             </tr>
           ))}

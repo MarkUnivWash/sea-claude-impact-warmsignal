@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { addNoteAction } from "@/app/actions";
+import { addNoteAction, enrichContactAction } from "@/app/actions";
 import { SubmitButton } from "@/components/submit-button";
 import { defaultEvalDate } from "@/lib/briefing";
 import { db, must } from "@/lib/supabase";
-import type { Contact, Interaction, Signal } from "@/lib/types";
+import type { Contact, Enrichment, Interaction, Signal } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
@@ -42,6 +42,8 @@ export default async function ContactPage({ params }: PageProps<"/contacts/[id]"
           </p>
         )}
       </div>
+
+      <WebProfile contact={contact} />
 
       <form action={addNoteAction} className="space-y-3 rounded-xl border border-stone-200 bg-white p-5">
         <h2 className="font-serif text-lg font-semibold">Log a conversation</h2>
@@ -122,5 +124,53 @@ function SignalList({ title, items }: { title: string; items: Signal[] }) {
         ))}
       </ul>
     </div>
+  );
+}
+
+function WebProfile({ contact }: { contact: Contact }) {
+  const e: Enrichment | null = contact.enrichment;
+  return (
+    <section className="rounded-xl border border-stone-200 bg-white p-5 text-sm">
+      <div className="flex items-center justify-between">
+        <h2 className="font-serif text-lg font-semibold">
+          Public web profile <span className="text-xs font-normal text-stone-500">via Tavily · unverified</span>
+        </h2>
+        <form action={enrichContactAction}>
+          <input type="hidden" name="contact_id" value={contact.id} />
+          <SubmitButton pendingText="Searching the web…" className="border border-stone-300 hover:bg-stone-100">
+            {contact.enriched_at ? "Refresh" : "Enrich"}
+          </SubmitButton>
+        </form>
+      </div>
+      {!e && <p className="mt-2 text-stone-500">Not enriched yet.</p>}
+      {e?.status === "no_confident_match" && (
+        <p className="mt-2 text-stone-500">No confident match found online. {e.identity_notes}</p>
+      )}
+      {e?.status === "matched" && (
+        <div className="mt-2 space-y-3">
+          <p>
+            {e.summary} <span className="text-xs text-stone-500">({e.identity_confidence} confidence: {e.identity_notes})</span>
+          </p>
+          {e.recent_signals.length > 0 && (
+            <ul className="space-y-1">
+              {e.recent_signals.map((x) => (
+                <li key={x.source_url + x.text}>
+                  <span className="rounded bg-sky-100 px-1.5 py-0.5 text-xs text-sky-800">{x.kind.replace("_", " ")}</span>{" "}
+                  {x.text} {x.date && <span className="text-stone-500">({x.date})</span>}{" "}
+                  <a href={x.source_url} target="_blank" rel="noreferrer" className="text-xs text-amber-700 hover:underline">
+                    source
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
+          {e.possible_offers.length > 0 && (
+            <p className="text-stone-600">
+              <span className="font-medium">Could offer:</span> {e.possible_offers.map((o) => o.text).join("; ")}
+            </p>
+          )}
+        </div>
+      )}
+    </section>
   );
 }

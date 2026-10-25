@@ -22,7 +22,7 @@ export const CATEGORIES = [
 
 const SignalSchema = z.object({
   category: z.enum(CATEGORIES),
-  description: z.string().describe("Short, specific description, e.g. 'Introductions to digital health seed investors'"),
+  description: z.string().describe("Max 10 words, specific, e.g. 'Digital health seed investors'"),
   supporting_text: z.string().describe("Exact quote copied verbatim from the note that supports this item"),
   is_inferred: z.boolean().describe("true if this is an assumption rather than something the person said or clearly did"),
   confidence: z.number().describe("0-1. Explicitly stated = 0.85-1.0. Inferred = 0.5 or below."),

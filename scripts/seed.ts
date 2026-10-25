@@ -1,10 +1,13 @@
 // Loads the sample dataset: contacts CSV -> conversation notes (Claude extraction) -> introduction matching.
-// Usage: npm run seed            (contacts + notes + matching)
+// Usage: npm run seed            (contacts + notes + enrichment + matching + drafts)
 //        npm run seed -- --reset (wipe all tables first)
 import { readFileSync } from "node:fs";
 import { importContactsCsv } from "../src/lib/contacts";
 import { ingestNote } from "../src/lib/extract";
 import { findIntroductions } from "../src/lib/match";
+import { defaultEvalDate } from "../src/lib/briefing";
+import { ensureDrafts } from "../src/lib/draft";
+import { enrichPending } from "../src/lib/enrich";
 import { db, must } from "../src/lib/supabase";
 
 async function main() {
@@ -36,9 +39,19 @@ async function main() {
     );
   }
 
+  if (process.env.TAVILY_API_KEY) {
+    console.log("Enriching contacts from the web…");
+    console.log(`Enriched ${await enrichPending()} contacts`);
+  } else {
+    console.log("TAVILY_API_KEY not set: skipping web enrichment");
+  }
+
   console.log("Finding introductions…");
   const result = await findIntroductions();
   console.log(`Assessed ${result.matches} candidate introductions across ${result.needs} needs`);
+
+  console.log("Drafting outreach for today's briefing…");
+  await ensureDrafts(defaultEvalDate());
 }
 
 main().catch((e) => {

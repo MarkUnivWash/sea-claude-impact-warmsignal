@@ -1,12 +1,9 @@
-import {
-  draftMessageAction,
-  findIntroductionsAction,
-  setConsentAction,
-  setEvalDateAction,
-  setStatusAction,
-} from "@/app/actions";
+import { Suspense } from "react";
+import { advanceAction, findIntroductionsAction, redraftAction, setEvalDateAction, setStatusAction } from "@/app/actions";
+import { DraftBox } from "@/components/draft-box";
 import { SubmitButton } from "@/components/submit-button";
-import { buildBriefing, defaultEvalDate, suggestedAction, type Candidate } from "@/lib/briefing";
+import { buildBriefing, defaultEvalDate, type Candidate } from "@/lib/briefing";
+import { draftKindFor, getOrCreateDraft } from "@/lib/draft";
 import { WEIGHTS } from "@/lib/scoring";
 
 export const dynamic = "force-dynamic";
@@ -45,6 +42,7 @@ export default async function BriefingPage({ searchParams }: PageProps<"/">) {
             <SubmitButton className="border border-stone-300 bg-white hover:bg-stone-100">Go</SubmitButton>
           </form>
           <form action={findIntroductionsAction}>
+            <input type="hidden" name="eval_date" value={evalDate} />
             <SubmitButton
               pendingText="Claude is reviewing your network…"
               className="bg-amber-600 text-white hover:bg-amber-700"
@@ -62,7 +60,7 @@ export default async function BriefingPage({ searchParams }: PageProps<"/">) {
         </p>
       )}
 
-      <ol className="space-y-6">
+      <ol className="space-y-5">
         {briefing.recommendations.map((c, i) => (
           <RecommendationCard key={c.opp.id} rank={i + 1} c={c} evalDate={evalDate} />
         ))}
@@ -107,146 +105,131 @@ export default async function BriefingPage({ searchParams }: PageProps<"/">) {
   );
 }
 
+const first = (name: string) => name.split(" ")[0];
+
 function RecommendationCard({ rank, c, evalDate }: { rank: number; c: Candidate; evalDate: string }) {
-  const first = c.recipient.name.split(" ")[0];
+  const r = first(c.recipient.name);
+  const p = first(c.proposed.name);
+  const kind = draftKindFor(c);
+  const step = {
+    ask_recipient: { n: 1, label: `Ask ${r} if they want the intro`, yes: "recipient_yes", yesLabel: `${r} said yes →` },
+    ask_proposed: { n: 2, label: `Check ${p} is open to it`, yes: "proposed_yes", yesLabel: `${p} said yes →` },
+    intro: { n: 3, label: `Introduce ${r} and ${p}`, yes: "intro_sent", yesLabel: "Intro sent ✓" },
+  }[kind];
+
   return (
-    <li className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm">
-      <div className="flex items-start justify-between gap-4">
-        <h2 className="font-serif text-xl font-semibold">
-          {rank}. Reconnect with {c.recipient.name}
-          <span className="ml-2 text-sm font-normal text-stone-500">
-            {c.recipient.title}, {c.recipient.company}
-          </span>
-        </h2>
-        <div className="shrink-0 rounded-full bg-amber-100 px-3 py-1 font-mono text-sm font-semibold text-amber-800">
-          {Math.round(c.score.total)}/100
+    <li className="rounded-xl border border-stone-200 bg-white p-5 shadow-sm">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h2 className="font-serif text-lg font-semibold leading-snug">
+            {rank}. Introduce {c.recipient.name} → {c.proposed.name}
+          </h2>
+          <p className="text-xs text-stone-500">
+            {c.recipient.title}, {c.recipient.company} · {c.proposed.title}, {c.proposed.company}
+          </p>
+        </div>
+        <div className="shrink-0 rounded-full bg-amber-100 px-2.5 py-0.5 font-mono text-sm font-semibold text-amber-800">
+          {Math.round(c.score.total)}
         </div>
       </div>
 
-      <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-[9rem_1fr]">
-        <dt className="font-medium text-stone-500">Opportunity</dt>
-        <dd>
-          Introduce {first} to <strong>{c.proposed.name}</strong> ({c.proposed.title}, {c.proposed.company}).{" "}
-          {c.opp.value_proposition}
-        </dd>
-
-        <dt className="font-medium text-stone-500">What {first} needs</dt>
-        <dd>
-          {c.need.description}
-          {c.need.is_inferred && <Badge tone="amber">inferred, not stated</Badge>}
-        </dd>
-
-        <dt className="font-medium text-stone-500">Why {c.proposed.name.split(" ")[0]}</dt>
-        <dd>
-          {c.opp.why_proposed}
-          {c.opp.match_basis === "profile_inference" && <Badge tone="amber">based on profile only</Badge>}
-        </dd>
-
+      <ul className="mt-3 space-y-1 text-sm">
+        <li>
+          <span className="font-medium">{r} needs:</span> {c.need.description}
+          {c.need.is_inferred && <Badge>inferred</Badge>}
+        </li>
+        <li>
+          <span className="font-medium">Why {p}:</span> {c.opp.why_proposed}
+          {c.opp.match_basis === "profile_inference" && <Badge>profile only</Badge>}
+        </li>
         {c.reciprocal.length > 0 && (
-          <>
-            <dt className="font-medium text-stone-500">Two-way value</dt>
-            <dd>
-              It helps {c.proposed.name.split(" ")[0]} too: {c.reciprocal.map((r) => r.need.description).join("; ")}.
-            </dd>
-          </>
+          <li>
+            <span className="font-medium">Two-way:</span> helps {p} too ({c.reciprocal[0].need.description})
+          </li>
         )}
-
         {c.opp.why_now && (
-          <>
-            <dt className="font-medium text-stone-500">Why now</dt>
-            <dd>{c.opp.why_now}</dd>
-          </>
+          <li>
+            <span className="font-medium">Why now:</span> {c.opp.why_now}
+          </li>
         )}
-
-        <dt className="font-medium text-stone-500">Relationship</dt>
-        <dd>
-          {first}: {c.recipient.relationship_strength}/5
-          {c.score.daysSinceInteraction != null && `, last spoke ${c.score.daysSinceInteraction} days ago`} ·{" "}
-          {c.proposed.name.split(" ")[0]}: {c.proposed.relationship_strength}/5
-        </dd>
-
-        {(c.opp.concerns || c.opp.missing_evidence) && (
-          <>
-            <dt className="font-medium text-stone-500">Watch out</dt>
-            <dd className="text-stone-700">{[c.opp.concerns, c.opp.missing_evidence].filter(Boolean).join(" ")}</dd>
-          </>
+        {c.opp.concerns && (
+          <li className="text-amber-800">
+            <span className="font-medium">⚠</span> {c.opp.concerns}
+          </li>
         )}
+      </ul>
 
-        <dt className="font-medium text-stone-500">Suggested action</dt>
-        <dd className="font-medium">{suggestedAction(c)}</dd>
-      </dl>
+      <div className="mt-4">
+        <div className="mb-2 flex items-center gap-2 text-sm">
+          <span className="rounded-full bg-stone-900 px-2 py-0.5 text-xs font-medium text-white">Step {step.n}/3</span>
+          <span className="font-medium">{step.label}</span>
+        </div>
+        <Suspense
+          fallback={<div className="h-28 animate-pulse rounded-lg bg-amber-50 p-3 text-sm text-amber-800">Drafting message…</div>}
+        >
+          <Draft c={c} label={kind === "intro" ? `To ${r} & ${p}` : `To ${kind === "ask_recipient" ? r : p}`} />
+        </Suspense>
+      </div>
 
-      <details className="mt-4 text-sm">
-        <summary className="cursor-pointer text-stone-600">Evidence &amp; score breakdown</summary>
-        <div className="mt-3 space-y-3">
-          <Evidence label={`${first}, ${c.need.note_date}`} text={c.need.supporting_text} verified={c.need.quote_verified} />
-          {c.offer && (
-            <Evidence
-              label={`${c.proposed.name.split(" ")[0]}, ${c.offer.note_date}`}
-              text={c.offer.supporting_text}
-              verified={c.offer.quote_verified}
-            />
+      <div className="mt-3 flex flex-wrap items-center gap-2">
+        <form action={advanceAction} className="flex gap-2">
+          <input type="hidden" name="id" value={c.opp.id} />
+          <SubmitButton name="step" value={step.yes} className="bg-emerald-600 text-white hover:bg-emerald-700">
+            {step.yesLabel}
+          </SubmitButton>
+          {kind !== "intro" && (
+            <SubmitButton name="step" value="declined" className="text-stone-500 hover:bg-stone-100">
+              Not interested
+            </SubmitButton>
           )}
-          <ScoreBars c={c} />
-        </div>
-      </details>
-
-      {c.opp.draft_message && (
-        <div className="mt-4 rounded-lg bg-stone-50 p-4 text-sm whitespace-pre-wrap">
-          <div className="mb-1 text-xs font-medium uppercase tracking-wide text-stone-500">Draft message to {first} (edit before sending)</div>
-          {c.opp.draft_message}
-        </div>
-      )}
-
-      <div className="mt-5 flex flex-wrap items-center gap-2 border-t border-stone-100 pt-4">
-        <form action={setStatusAction} className="flex flex-wrap gap-2">
+        </form>
+        <form action={setStatusAction} className="ml-auto flex gap-1 text-stone-500">
           <input type="hidden" name="id" value={c.opp.id} />
           <input type="hidden" name="eval_date" value={evalDate} />
-          <SubmitButton name="status" value="useful" className={c.opp.status === "useful" ? "bg-emerald-600 text-white" : "border border-emerald-600 text-emerald-700 hover:bg-emerald-50"}>
-            {c.opp.status === "useful" ? "✓ Useful" : "Useful"}
+          <SubmitButton name="status" value="deferred" className="!px-2 text-xs hover:bg-stone-100">
+            Defer 7d
           </SubmitButton>
-          <SubmitButton name="status" value="deferred" className="border border-stone-300 hover:bg-stone-100">
-            Defer 7 days
+          <SubmitButton name="status" value="dismissed" className="!px-2 text-xs hover:bg-stone-100">
+            Not relevant
           </SubmitButton>
-          <SubmitButton name="status" value="dismissed" className="border border-stone-300 hover:bg-stone-100">
-            Dismiss
-          </SubmitButton>
-          <SubmitButton name="status" value="completed" className="border border-stone-300 hover:bg-stone-100">
+          <SubmitButton name="status" value="completed" className="!px-2 text-xs hover:bg-stone-100">
             Already handled
           </SubmitButton>
         </form>
-        <form action={draftMessageAction}>
+        <form action={redraftAction}>
           <input type="hidden" name="id" value={c.opp.id} />
-          <input type="hidden" name="eval_date" value={evalDate} />
-          <SubmitButton pendingText="Drafting…" className="border border-amber-600 text-amber-700 hover:bg-amber-50">
-            {c.opp.draft_message ? "Redraft message" : "Draft message"}
-          </SubmitButton>
-        </form>
-        <form action={setConsentAction} className="ml-auto flex items-center gap-1 text-xs text-stone-500">
-          <input type="hidden" name="id" value={c.opp.id} />
-          Consent:
-          {(["not_requested", "pending", "approved", "declined"] as const).map((s) => (
-            <SubmitButton
-              key={s}
-              name="consent"
-              value={s}
-              className={`!px-2 !py-0.5 !text-xs ${c.opp.consent_status === s ? "bg-stone-800 text-white" : "hover:bg-stone-100"}`}
-            >
-              {s.replace("_", " ")}
-            </SubmitButton>
-          ))}
+          <SubmitButton className="!px-2 text-xs text-stone-500 hover:bg-stone-100">Redraft</SubmitButton>
         </form>
       </div>
+
+      <details className="mt-3 text-sm">
+        <summary className="cursor-pointer text-xs text-stone-500">Evidence &amp; score</summary>
+        <div className="mt-3 space-y-3">
+          <Evidence label={`${r}, ${c.need.note_date}`} text={c.need.supporting_text} verified={c.need.quote_verified} />
+          {c.offer && (
+            <Evidence label={`${p}, ${c.offer.note_date}`} text={c.offer.supporting_text} verified={c.offer.quote_verified} />
+          )}
+          {c.opp.missing_evidence && <p className="text-xs text-stone-500">Unknown: {c.opp.missing_evidence}</p>}
+          <ScoreBars c={c} />
+        </div>
+      </details>
     </li>
   );
 }
 
-function Badge({ children, tone }: { children: React.ReactNode; tone: "amber" }) {
-  return (
-    <span className={`ml-2 rounded px-1.5 py-0.5 text-xs ${tone === "amber" ? "bg-amber-100 text-amber-800" : ""}`}>
-      {children}
-    </span>
+async function Draft({ c, label }: { c: Candidate; label: string }) {
+  const result = await getOrCreateDraft(c).then(
+    (draft) => ({ draft, error: null }),
+    (e: Error) => ({ draft: null, error: e.message }),
   );
+  if (result.draft == null) {
+    return <p className="text-sm text-red-700">Couldn&apos;t draft a message: {result.error}</p>;
+  }
+  return <DraftBox key={result.draft} draft={result.draft} label={label} />;
+}
+
+function Badge({ children }: { children: React.ReactNode }) {
+  return <span className="ml-2 rounded bg-amber-100 px-1.5 py-0.5 text-xs text-amber-800">{children}</span>;
 }
 
 function Evidence({ label, text, verified }: { label: string; text: string; verified: boolean }) {

@@ -96,17 +96,3 @@ export async function buildBriefing(evalDate: string): Promise<Briefing> {
     filteredOut: candidates.filter((c) => c.excludedReason).sort(byScore),
   };
 }
-
-/** PRD §5.8: unknown willingness => permission-first action, never assumed consent. */
-export function suggestedAction(c: Candidate): string {
-  const r = c.recipient.name.split(" ")[0];
-  const p = c.proposed.name.split(" ")[0];
-  switch (c.opp.consent_status) {
-    case "approved":
-      return `Both sides have agreed. Send a double-opt-in intro connecting ${r} and ${p}.`;
-    case "pending":
-      return `Waiting to hear back. Follow up on the consent request before sharing contact details.`;
-    default:
-      return `Ask ${r} whether they'd like an introduction to ${p}. If yes, check that ${p} is open to connecting before you share anyone's details.`;
-  }
-}

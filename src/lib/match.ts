@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { structuredCall } from "./claude";
 import { db, must } from "./supabase";
+import { enrichmentLine } from "./enrich";
 import type { Contact, Signal } from "./types";
 
 // Stages B + C (PRD §8): candidate generation and match validation.
@@ -16,12 +17,12 @@ const MatchSchema = z.object({
   match_basis: z.enum(["stated_offer", "profile_inference"]),
   match_confidence: z.number().describe("0-1: how trustworthy and specific the evidence is"),
   timeliness: z.number().int().describe("0-5: is there a current reason (deadline, active process, recent mention)?"),
-  value_proposition: z.string().describe("One sentence: what the recipient gets from this introduction"),
-  why_proposed: z.string().describe("Why this person, grounded in their recorded offer or profile"),
-  why_now: z.string().nullable(),
+  value_proposition: z.string().describe("Max 15 words: what the recipient gets from this introduction"),
+  why_proposed: z.string().describe("Max 20 words: why this person, grounded in their recorded offer or profile"),
+  why_now: z.string().nullable().describe("Max 12 words, or null if there is no current trigger"),
   appropriate: z.boolean().describe("false if the intro would violate a stated preference, confidentiality, or be otherwise inappropriate"),
-  concerns: z.string().nullable().describe("Preferences, sensitivities, or risks Alonso should know"),
-  missing_evidence: z.string().nullable().describe("What we don't know yet (e.g. whether the proposed contact is open to it)"),
+  concerns: z.string().nullable().describe("Max 15 words: a preference, sensitivity, or risk Alonso must respect; null if none"),
+  missing_evidence: z.string().nullable().describe("Max 15 words: the most important unknown; null if none beyond consent"),
 });
 
 const MatchResultSchema = z.object({ matches: z.array(MatchSchema) });
@@ -38,7 +39,9 @@ Rules:
 - Respect stated investment criteria (stage, sector, traction). Mismatches lower give_value.
 - Needs marked INFERRED are assumptions; reflect that in match_confidence.
 - For each need, return up to 3 candidates, best first. Include a notable rejected candidate (low give_value or appropriate=false) only if it is an obvious-looking match that should NOT be made. Return nothing for a need with no plausible match.
-- Never propose the recipient themselves.`;
+- Never propose the recipient themselves.
+- "public web" lines are unverified context from web search. They can support why_now or a profile_inference, but never count as a stated need or stated offer.
+- Write tersely: Alonso reads each recommendation in under 30 seconds. Respect the word limits.`;
 
 function contactLine(c: Contact) {
   const pref = c.introduction_preferences ? ` | intro preferences: ${c.introduction_preferences}` : "";
@@ -77,6 +80,8 @@ export async function findIntroductions(): Promise<{ needs: number; matches: num
       const lines = [contactLine(c)];
       for (const o of theirOffers) lines.push(`  offer ${signalLine(offerRefBySignal.get(o.id)!, o)}`);
       for (const u of new Set(sensitivities)) lines.push(`  note: ${u}`);
+      const web = enrichmentLine(c.enrichment);
+      if (web) lines.push(`  ${web}`);
       return lines.join("\n");
     })
     .join("\n");
