@@ -1,10 +1,11 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-// Refreshes the Supabase session cookie on every request and sends signed-out users to /login.
+// Refreshes the Supabase session cookie on every request. Signed-out visitors to "/" see the
+// landing page (/welcome); every other protected path sends them to /login.
 // Pages and server actions also check the user themselves (requireCtx); this is the first gate.
 
-const PUBLIC_PATHS = ["/login", "/signup"];
+const PUBLIC_PATHS = ["/login", "/signup", "/welcome"];
 
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
@@ -27,7 +28,7 @@ export async function proxy(request: NextRequest) {
 
   if (!signedIn && !isPublic) {
     const url = request.nextUrl.clone();
-    url.pathname = "/login";
+    url.pathname = request.nextUrl.pathname === "/" ? "/welcome" : "/login";
     url.search = "";
     return NextResponse.redirect(url);
   }
@@ -41,5 +42,8 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  // Static files (images, models, fonts, video) skip the proxy so the public landing page can load them.
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:png|jpg|jpeg|gif|svg|webp|avif|ico|glb|gltf|hdr|ktx2|woff2?|mp4|webm)$).*)",
+  ],
 };
