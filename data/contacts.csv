@@ -1,0 +1,31 @@
+contact_id,name,company,title,industry,relationship_strength,last_interaction_date,introduction_preferences
+c001,Sarah Chen,MedLoop AI,CEO & Co-founder,Healthcare AI,4,2026-08-20,
+c002,Michael Reed,Northbeam Ventures,General Partner,Venture Capital,4,2026-07-30,Happy to meet founders Alonso vouches for
+c003,Priya Natarajan,Independent,Advisor (former VP Enterprise Sales at HealthGrid),Healthcare SaaS,3,2026-09-02,
+c004,David Okafor,Ledgerline,CEO,Fintech,4,2026-08-05,
+c005,Elena Rossi,Paystream,Director of Engineering,Fintech,3,2026-09-10,Keep her job search confidential - do not mention to her current employer
+c006,Tom Becker,Routewise,CEO,Logistics SaaS,5,2026-07-15,No investor intros right now - focused on customers
+c007,Grace Liu,Brightmart Stores,VP Operations,Retail,3,2026-08-28,
+c008,Marcus Johnson,Fernstack,CEO,Developer Tools,2,2026-09-18,
+c009,James Park,Coinvault,Founder,Crypto,2,2026-09-25,
+c010,Hannah Kim,Sequel Capital,Partner,Venture Capital,3,2026-06-12,Only Series A and later - please no pre-seed or seed intros
+c011,Olivia Martinez,Bloom & Co,CMO,Consumer Goods,4,2026-08-12,
+c012,Ben Carter,Signal Studio,Founder,B2B Podcast Agency,3,2026-07-22,
+c013,Kevin Wright,Tallgrass Robotics,COO,Robotics,2,2025-12-03,
+c014,Aisha Bello,Kinfolk Health,Head of Partnerships,Digital Health,3,2026-05-20,
+c015,Ryan O'Neil,Clearpath Legal,Partner,Legal Services,3,2026-04-11,
+c016,Sofia Alvarez,Vantage Growth,Founder,Marketing Agency,4,2026-09-28,
+c017,Daniel Wu,Nimbus Data,CTO,Data Infrastructure,3,2026-08-01,
+c018,Laura Schmidt,Helix Bio,VP Clinical Operations,Biotech,2,2026-03-15,
+c019,Chris Taylor,Summit Talent,Executive Recruiter,Recruiting,2,2026-09-05,
+c020,Natalie Brooks,Evergreen Angels,Angel Investor,Angel Investing,3,2026-06-30,
+c021,Omar Haddad,Packwise,Founder & CEO,E-commerce Logistics,3,2026-02-14,
+c022,Megan Foster,Cobalt Cloud,VP Marketing,Cloud Infrastructure,3,2026-07-08,
+c023,Jorge Ramirez,Lumen Payments,Head of Compliance,Fintech,2,2026-05-02,
+c024,Emily Zhang,Ardent Design,Founder,Brand Design Agency,4,2026-09-14,
+c025,Patrick Nolan,Harbor Bank,SVP Commercial Banking,Banking,2,2026-01-20,
+c026,Rachel Adams,TalentForge,Founder,Recruiting,1,2026-09-20,
+c027,Victor Lee,Arcadia Health Partners,Managing Director,Healthcare Private Equity,2,2025-11-08,
+c028,Isabel Novak,Quill CX,CEO,Customer Support SaaS,3,2026-08-25,
+c029,Samuel Grant,Ironclad Security,CISO,Cybersecurity,3,2026-06-18,
+c030,Zoe Patel,Sprout Kids,Founder,Consumer Edtech,3,2026-09-30,
