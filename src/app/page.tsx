@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Suspense } from "react";
 import {
   ArrowLeftRight,
@@ -7,6 +8,7 @@ import {
   Check,
   ChevronDown,
   CircleAlert,
+  Coffee,
   Filter,
   Layers,
   RefreshCw,
@@ -28,6 +30,7 @@ import { SubmitButton } from "@/components/submit-button";
 import { Avatar, btn, card, Chip, Logo, PageHeader } from "@/components/ui";
 import { requireCtx } from "@/lib/auth";
 import { buildBriefing, defaultEvalDate, type Candidate } from "@/lib/briefing";
+import { buildCatchUpDeck } from "@/lib/catch-up";
 import { draftKindFor, getOrCreateDraft } from "@/lib/draft";
 import { WEIGHTS } from "@/lib/scoring";
 
@@ -45,6 +48,7 @@ export default async function BriefingPage({ searchParams }: PageProps<"/">) {
   if (!contactCount) return <Welcome />;
 
   const briefing = await buildBriefing(ctx, evalDate);
+  const catchUp = await buildCatchUpDeck(ctx, evalDate, briefing);
   const n = briefing.recommendations.length;
 
   return (
@@ -80,6 +84,8 @@ export default async function BriefingPage({ searchParams }: PageProps<"/">) {
           </>
         }
       />
+
+      {catchUp.length > 0 && <CatchUpNudge people={catchUp.map((c) => c.name)} evalDate={evalDate} />}
 
       {n === 0 && (
         <div className={`${card} flex flex-col items-center px-6 py-14 text-center`}>
@@ -149,6 +155,35 @@ export default async function BriefingPage({ searchParams }: PageProps<"/">) {
         </div>
       )}
     </div>
+  );
+}
+
+/** Nudge toward the catch-up deck: a stack of the people due for a meeting. */
+function CatchUpNudge({ people, evalDate }: { people: string[]; evalDate: string }) {
+  const n = people.length;
+  return (
+    <Link
+      href={evalDate === defaultEvalDate() ? "/catch-up" : `/catch-up?date=${evalDate}`}
+      className={`${card} group flex animate-rise items-center gap-4 px-5 py-4 transition hover:shadow-card-lg sm:px-6`}
+    >
+      <span className="flex -space-x-3">
+        {people.slice(0, 3).map((name) => (
+          <Avatar key={name} name={name} size="sm" />
+        ))}
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block font-semibold text-slate-900">
+          {n} {n === 1 ? "person is" : "people are"} due for a catch-up
+        </span>
+        <span className="block truncate text-sm text-slate-500">
+          {people.slice(0, 2).map((p) => p.split(" ")[0]).join(", ")}
+          {n > 2 && ` and ${n - 2} more`}. Swipe through them in a minute.
+        </span>
+      </span>
+      <span className={`inline-flex shrink-0 items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-medium transition group-hover:bg-ink-800 ${btn.primary}`}>
+        <Coffee className="size-4" /> <span className="hidden sm:inline">Start</span>
+      </span>
+    </Link>
   );
 }
 

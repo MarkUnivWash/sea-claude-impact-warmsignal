@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { after } from "next/server";
 import { requireCtx, userDb } from "@/lib/auth";
 import { defaultEvalDate } from "@/lib/briefing";
+import { getOrCreateCatchUpDraft, recordDecision, type CatchUpDecision } from "@/lib/catch-up";
 import { importContactsCsv } from "@/lib/contacts";
 import { loadDemoData, removeDemoData } from "@/lib/demo";
 import { ensureDrafts } from "@/lib/draft";
@@ -209,4 +210,39 @@ export async function redraftAction(formData: FormData) {
 
 export async function setEvalDateAction(formData: FormData) {
   redirect(`/?date=${String(formData.get("date"))}`);
+}
+
+// ---------- Catch-up deck ----------
+// Called directly from the swipe deck (not forms). They return results instead of throwing, and skip
+// revalidation so a swipe doesn't re-render the deck; other pages are dynamic and refetch on navigation.
+
+export type Result<T> = { ok: true; value: T } | { ok: false; error: string };
+
+const isDate = (s: string) => /^\d{4}-\d{2}-\d{2}$/.test(s);
+
+export async function catchUpDraftAction(contactId: string, evalDate: string, fresh = false): Promise<Result<string>> {
+  if (typeof contactId !== "string" || !isDate(evalDate)) return { ok: false, error: "Invalid request" };
+  const ctx = await requireCtx(); // outside try: its redirect to /login must propagate
+  try {
+    return { ok: true, value: await getOrCreateCatchUpDraft(ctx, contactId, evalDate, fresh === true) };
+  } catch (e) {
+    return { ok: false, error: (e as Error).message };
+  }
+}
+
+export async function catchUpDecisionAction(
+  contactId: string,
+  decision: CatchUpDecision,
+  evalDate: string,
+): Promise<Result<null>> {
+  if (typeof contactId !== "string" || !isDate(evalDate) || (decision !== "sent" && decision !== "snooze")) {
+    return { ok: false, error: "Invalid request" };
+  }
+  const ctx = await requireCtx();
+  try {
+    await recordDecision(ctx, contactId, decision, evalDate);
+    return { ok: true, value: null };
+  } catch (e) {
+    return { ok: false, error: (e as Error).message };
+  }
 }

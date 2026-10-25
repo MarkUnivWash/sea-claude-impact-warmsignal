@@ -10,6 +10,9 @@ export type Contact = {
   introduction_preferences: string | null;
   enrichment: Enrichment | null;
   enriched_at: string | null;
+  last_outreach_at: string | null;
+  outreach_snoozed_until: string | null;
+  outreach_draft: string | null;
 };
 
 export type SourcedItem = { text: string; source_url: string; date: string | null };

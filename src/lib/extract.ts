@@ -111,16 +111,15 @@ export async function ingestNote(ctx: Ctx, contactId: string, date: string, note
       .eq("id", interaction.id),
   );
 
-  // A logged conversation is a meaningful interaction.
-  if (!contact.last_interaction_date || date > contact.last_interaction_date) {
-    must(
-      await supabase
-        .from("contacts")
-        .update({ last_interaction_date: date })
-        .eq("owner_id", ownerId)
-        .eq("id", contactId),
-    );
-  }
+  // A logged conversation is a meaningful interaction, and new context makes any cached catch-up draft stale.
+  const newer = !contact.last_interaction_date || date > contact.last_interaction_date;
+  must(
+    await supabase
+      .from("contacts")
+      .update({ outreach_draft: null, ...(newer && { last_interaction_date: date }) })
+      .eq("owner_id", ownerId)
+      .eq("id", contactId),
+  );
 
   return interaction.id;
 }
