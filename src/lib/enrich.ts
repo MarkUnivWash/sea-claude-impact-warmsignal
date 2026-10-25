@@ -1,7 +1,8 @@
 import { tavily, type TavilySearchResponse } from "@tavily/core";
 import { z } from "zod";
 import { FAST_MODEL, structuredCall, structuredStream } from "./claude";
-import { must, type Ctx } from "./supabase";
+import { DEMO_FICTIONAL_IDS } from "./demo";
+import { must, serviceDb, type Ctx } from "./supabase";
 import type { Contact, Enrichment } from "./types";
 
 // Automatic contact enrichment: Tavily web search -> Claude identity check + summary.
@@ -34,6 +35,31 @@ const SYSTEM = `You enrich a contact record for a relationship-intelligence tool
 - First decide whether the results are about this exact person/company. Same name alone is not enough; company and role should line up. If unsure, use "low" or "none" and leave everything else empty.
 - Only state what the sources say. Every signal and offer needs a source_url copied from the results.
 - Be terse.`;
+
+/** Contacts are re-enriched once their last enrichment is this old. */
+export const REFRESH_AFTER_DAYS = 14;
+
+// Reputable business/tech outlets and press wires. Open news search returns a lot of SEO spam,
+// so these are preferred (not required: small companies rarely make major outlets).
+const NEWS_DOMAINS = [
+  "reuters.com",
+  "bloomberg.com",
+  "wsj.com",
+  "ft.com",
+  "cnbc.com",
+  "axios.com",
+  "techcrunch.com",
+  "theverge.com",
+  "geekwire.com",
+  "venturebeat.com",
+  "businessinsider.com",
+  "forbes.com",
+  "fiercehealthcare.com",
+  "statnews.com",
+  "businesswire.com",
+  "prnewswire.com",
+  "globenewswire.com",
+];
 
 let client: ReturnType<typeof tavily> | null = null;
 function search() {
@@ -79,7 +105,14 @@ export async function enrichContact(
     t.search(personQuery, { searchDepth: "basic", maxResults: 5 }).then(reported("person")),
     companyQuery
       ? t
-          .search(companyQuery, { searchDepth: "basic", topic: "news", timeRange: "year", maxResults: 5 })
+          .search(companyQuery, {
+            searchDepth: "basic",
+            topic: "news",
+            timeRange: "year",
+            maxResults: 5,
+            includeDomains: NEWS_DOMAINS,
+            includeDomainsMode: "prefer",
+          })
           .then(reported("company"))
       : Promise.resolve({ results: [] as TavilySearchResponse["results"] }),
   ]);
@@ -146,7 +179,10 @@ export async function enrichAndSave(
     await supabase.from("contacts").select("*").eq("owner_id", ownerId).eq("id", contactId).single(),
   );
   // Only the final, identity-gated result is saved; partial output never reaches the database.
-  const enrichment = await enrichContact(contact, opts);
+  const fresh = await enrichContact(contact, opts);
+  // A refresh that can't confirm identity (e.g. a quiet news period) keeps the last good match.
+  const enrichment =
+    fresh.status === "no_confident_match" && contact.enrichment?.status === "matched" ? contact.enrichment : fresh;
   must(
     await supabase
       .from("contacts")
@@ -175,6 +211,40 @@ export async function enrichPending(
     );
   }
   return ids.length;
+}
+
+/**
+ * Scheduled refresh across all accounts (service client; run by the cron route). Re-enriches contacts
+ * never enriched or last enriched more than REFRESH_AFTER_DAYS ago, oldest first, up to `limit` per run.
+ * Fictional demo contacts are skipped: searching them only finds namesakes.
+ */
+export async function refreshStaleEnrichment(
+  opts: { limit?: number; concurrency?: number } = {},
+): Promise<{ refreshed: number; failed: number }> {
+  if (!process.env.TAVILY_API_KEY) return { refreshed: 0, failed: 0 };
+  const cutoff = new Date(Date.now() - REFRESH_AFTER_DAYS * 86_400_000).toISOString();
+  const due = must<{ id: string; owner_id: string; external_id: string | null }[]>(
+    await serviceDb()
+      .from("contacts")
+      .select("id, owner_id, external_id")
+      .or(`enriched_at.is.null,enriched_at.lt.${cutoff}`)
+      .order("enriched_at", { ascending: true, nullsFirst: true })
+      .limit(opts.limit ?? 200),
+  ).filter((c) => !c.external_id || !DEMO_FICTIONAL_IDS.has(c.external_id));
+
+  let failed = 0;
+  const size = opts.concurrency ?? 5;
+  for (let i = 0; i < due.length; i += size) {
+    await Promise.all(
+      due.slice(i, i + size).map((c) =>
+        enrichAndSave({ db: serviceDb(), ownerId: c.owner_id }, c.id).catch((e) => {
+          failed++;
+          console.error(`Enrichment refresh failed for ${c.id}:`, e);
+        }),
+      ),
+    );
+  }
+  return { refreshed: due.length - failed, failed };
 }
 
 /** One line for prompts. Clearly labeled as unverified public info. */

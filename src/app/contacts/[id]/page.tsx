@@ -19,6 +19,7 @@ import { SubmitButton } from "@/components/submit-button";
 import { Avatar, btn, card, Chip, formatDate, input, SignalBars } from "@/components/ui";
 import { defaultEvalDate } from "@/lib/briefing";
 import { requireCtx } from "@/lib/auth";
+import { REFRESH_AFTER_DAYS } from "@/lib/enrich";
 import { must } from "@/lib/supabase";
 import type { Contact, Enrichment, Interaction, Signal } from "@/lib/types";
 
@@ -247,6 +248,11 @@ function WebProfile({ contact }: { contact: Contact }) {
             </div>
           )}
         </div>
+      )}
+      {contact.enriched_at && (
+        <p className="mt-4 text-xs text-slate-400">
+          Checked {contact.enriched_at.slice(0, 10)} · refreshes every {REFRESH_AFTER_DAYS} days
+        </p>
       )}
     </EnrichPanel>
   );
